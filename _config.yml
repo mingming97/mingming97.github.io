@@ -10,6 +10,7 @@ author: ljm
 language: zh-Hans
 timezone:
 
+
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
 url: https://mingming97.github.io/
@@ -80,3 +81,16 @@ deploy:
   type: git
   repo: git@github.com:mingming97/mingming97.github.io.git
   branch: master
+
+# Extensions
+Plugins:
+- hexo-generator-feed
+- hexo-generator-sitemap
+# Feed Atom
+feed:
+  type: atom
+  path: atom.xml
+  limit: 20
+# sitemap
+sitemap:
+  path: sitemap.xml
