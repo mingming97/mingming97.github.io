@@ -127,7 +127,7 @@ social_icons:
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.jpg
 # in site  directory(source/uploads): /uploads/avatar.jpg
-#avatar:
+avatar: http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg
 
 # Table Of Contents in the Sidebar
 toc:
@@ -565,7 +565,7 @@ use_motion: true
 fancybox: true
 
 # Progress bar in the top during page loading.
-pace: false
+pace: true
 # Themes list:
 #pace-theme-big-counter
 #pace-theme-bounce
