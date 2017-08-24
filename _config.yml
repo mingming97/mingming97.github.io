@@ -8,7 +8,7 @@ subtitle:
 description:
 author: ljm
 language: zh-Hans
-timezone:
+timezone: Asia/Shanghai
 
 
 # URL
@@ -83,14 +83,7 @@ deploy:
   branch: master
 
 # Extensions
-Plugins:
-- hexo-generator-feed
-- hexo-generator-sitemap
-# Feed Atom
-feed:
-  type: atom
-  path: atom.xml
-  limit: 20
-# sitemap
-sitemap:
-  path: sitemap.xml
+## Plugins: http://hexo.io.plugins/
+plugins: hexo-generator-feed
+
+
