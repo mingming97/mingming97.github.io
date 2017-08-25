@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>ljm&#39;s blog</title>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://mingming97.github.io/"/>
+  <updated>2017-08-24T09:06:21.280Z</updated>
+  <id>https://mingming97.github.io/</id>
+  
+  <author>
+    <name>ljm</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="https://mingming97.github.io/2017/08/24/hello-world/"/>
+    <id>https://mingming97.github.io/2017/08/24/hello-world/</id>
+    <published>2017-08-24T05:50:17.237Z</published>
+    <updated>2017-08-24T09:06:21.280Z</updated>
+    
+    <content type="html"><![CDATA[<p>This is just a test.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;This is just a test.&lt;/p&gt;
+
+    
+    </summary>
+    
+    
+  </entry>
+  
+</feed>
