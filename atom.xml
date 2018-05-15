@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mingming97.github.io/"/>
-  <updated>2018-05-15T11:10:07.975Z</updated>
+  <updated>2018-05-15T13:40:40.956Z</updated>
   <id>https://mingming97.github.io/</id>
   
   <author>
@@ -14,6 +14,37 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>hexo配置LaTeX公式</title>
+    <link href="https://mingming97.github.io/2018/05/15/hexo-latex/"/>
+    <id>https://mingming97.github.io/2018/05/15/hexo-latex/</id>
+    <published>2018-05-15T13:12:18.000Z</published>
+    <updated>2018-05-15T13:40:40.956Z</updated>
+    
+    <content type="html"><![CDATA[<p>  正常的hexo框架在默认情况下渲染数学公式会有很多问题，可以通过将hexo默认的引擎“hexo-renderer-marked”更换为“hexo-renderer-markdown-it-plus”来渲染markdown。<br>
+  首先要将之前的“hexo-renderer-marked”卸载，并安装“hexo-renderer-markdown-it-plus”。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm uninstall hexo-renderer-marked --save</div><div class="line">npm install hexo-renderer-markdown-it-plus --save</div></pre></td></tr></table></figure>
+<p>  在这之后建议修改根目录下的_config.yml，添加如下内容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line">markdown_it_plus:</div><div class="line">  highlight: true</div><div class="line">  html: true</div><div class="line">  xhtmlOut: true</div><div class="line">  breaks: true</div><div class="line">  langPrefix:</div><div class="line">  linkify: true</div><div class="line">  typographer:</div><div class="line">  quotes: “”‘’</div><div class="line">  plugins:</div><div class="line">    - plugin:</div><div class="line">        name: markdown-it-katex</div><div class="line">        enable: true</div><div class="line">    - plugin:</div><div class="line">        name: markdown-it-mark</div><div class="line">        enable: false</div></pre></td></tr></table></figure>
+<p>  在文章中要启用mathjax，可以在markdown的YAML Front Matter处添加mathjax: true来解决，也可以在主题配置文件里去解决。以next为例，在./themes/next/_config.yml中，将mathjax的enable项设置为true，就可以不用每次都加入mathjax的设置了。</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;p&gt;  正常的hexo框架在默认情况下渲染数学公式会有很多问题，可以通过将hexo默认的引擎“hexo-renderer-marked”更换为“hexo-renderer-markdown-it-plus”来渲染markdown。&lt;br&gt;
+  首先要将之前的“hexo-rend
+    
+    </summary>
+    
+      <category term="hexo" scheme="https://mingming97.github.io/categories/hexo/"/>
+    
+    
+      <category term="LaTeX" scheme="https://mingming97.github.io/tags/LaTeX/"/>
+    
+      <category term="hexo" scheme="https://mingming97.github.io/tags/hexo/"/>
+    
+  </entry>
   
   <entry>
     <title>LIS的O(nlogn)实现原理</title>
