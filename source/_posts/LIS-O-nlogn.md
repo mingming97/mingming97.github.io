@@ -10,15 +10,12 @@ categories: 算法
 
 　　所以可以按顺序枚举**a[i]**，如果**a[i]**的值比B中的最大值要大，则将**a[i]**放入**B[i]**的尾部，最大长度加1; 否则对B进行二分查找以找到**a[i]**该放入的位置，**pos = min{j | B[j] > a[i]}**，用a[i]代替B[pos]，使a[i]成为子序列长度为pos时的最小值。大致过程如下：
 ```c++
-for (int i=1; i<n; i++)
-{
-	if (a[i] > B[len-1])
-	{
+for (int i=1; i<n; i++) {
+	if (a[i] > B[len-1]) {
 		B[len] = a[i];
 		len++;
 	}
-	else
-	{
+	else {
 		pos = binarySearch(len, a[i]);
 		B[pos] = a[i];
 	}
