@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://mingming97.github.io/about/index.html</loc>
+    
+    <lastmod>2018-05-16T14:55:02.151Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mingming97.github.io/2018/05/15/hexo-latex/</loc>
     
     <lastmod>2018-05-15T13:40:40.956Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>https://mingming97.github.io/2017/08/28/Union-Find/</loc>
     
     <lastmod>2018-05-15T11:08:39.440Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mingming97.github.io/about/index.html</loc>
-    
-    <lastmod>2017-08-29T04:54:49.678Z</lastmod>
     
   </url>
   
