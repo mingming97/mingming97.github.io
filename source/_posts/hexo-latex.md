@@ -2,33 +2,17 @@
 title: hexo配置LaTeX公式
 date: 2018-5-15 21:12:18
 tags: [LaTeX, hexo]
+mathjax: true
 categories: hexo
 ---
 
-&emsp;&emsp;正常的hexo框架在默认情况下渲染数学公式会有很多问题，可以通过将hexo默认的引擎“hexo-renderer-marked”更换为“hexo-renderer-markdown-it-plus”来渲染markdown。
-&emsp;&emsp;首先要将之前的“hexo-renderer-marked”卸载，并安装“hexo-renderer-markdown-it-plus”。
+&emsp;&emsp;正常的hexo框架在默认情况下渲染数学公式会有很多问题，可以通过将hexo默认的引擎```hexo-renderer-marked```更换为“hexo-renderer-kramed”来渲染markdown。
+&emsp;&emsp;首先要将之前的```hexo-renderer-marked```卸载，并安装```hexo-renderer-kramed```。
 ```
 npm uninstall hexo-renderer-marked --save
-npm install hexo-renderer-markdown-it-plus --save
+npm install hexo-renderer-kramed --save
 ```
-&emsp;&emsp;在这之后建议修改根目录下的\_config.yml，添加如下内容。
-```
-markdown_it_plus:
-  highlight: true
-  html: true
-  xhtmlOut: true
-  breaks: true
-  langPrefix:
-  linkify: true
-  typographer:
-  quotes: “”‘’
-  plugins:
-    - plugin:
-        name: markdown-it-katex
-        enable: true
-    - plugin:
-        name: markdown-it-mark
-        enable: false
-```
-&emsp;&emsp;在文章中要启用mathjax，可以在markdown的YAML Front Matter处添加mathjax: true来解决，也可以在主题配置文件里去解决。以next为例，在./themes/next/\_config.yml中，将mathjax的enable项设置为true，就可以不用每次都加入mathjax的设置了。
+&emsp;&emsp;在这之后建议在hexo的根目录下找到```package.json```文件，用文本编辑器打开它，删除字符串`hexo-renderer-marked`所在的一行并保存。之所以不直接卸载`hexo-renderer-marked`，是因为其他重要包极有可能在卸载该包的同时被删除。 
+&emsp;&emsp;不要忘了行内公式的转义字符，打开```./node_modules/kramed/lib/rules```，并修改```inline.js```文件的11和20行，分别修改为```escape: /^\\([`*\[\]()#$+\-.!_>])/,```和```em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,```。
+&emsp;&emsp;每次在写文章前，要在YAML font-matter中添加```mathjax: true```，这样便能确保启动mathjax引擎进行渲染了。
 
