@@ -86,7 +86,7 @@
 <link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="dp," />
+  <meta name="keywords" content="Hexo, NexT" />
 
 
 
@@ -104,18 +104,13 @@
 
 
 
-<meta name="description" content="朴素的LIS的O(n²)算法是用dp，用d[i]表示a[i]中以i为结尾的LIS的值，那么状态转移方程可表示为d[i] = max{d[j] | j &amp;lt; i &amp;amp;&amp;amp; a[j] &amp;lt; a[i]} + 1。显然，对于一个i下的两个不同决策j，k (j,k &amp;lt; i)，若a[j] &amp;lt; a[k]，d[j] &amp;gt;= d[k]，而a[i] &amp;gt; a[k]时，k显然没有">
-<meta name="keywords" content="dp">
-<meta property="og:type" content="article">
-<meta property="og:title" content="LIS的O(nlogn)实现原理">
-<meta property="og:url" content="https://mingming97.github.io/2017/08/30/LIS-O-nlogn/index.html">
+<meta property="og:type" content="website">
+<meta property="og:title" content="ljm&#39;s blog">
+<meta property="og:url" content="https://mingming97.github.io/categories/NLP/index.html">
 <meta property="og:site_name" content="ljm&#39;s blog">
-<meta property="og:description" content="朴素的LIS的O(n²)算法是用dp，用d[i]表示a[i]中以i为结尾的LIS的值，那么状态转移方程可表示为d[i] = max{d[j] | j &amp;lt; i &amp;amp;&amp;amp; a[j] &amp;lt; a[i]} + 1。显然，对于一个i下的两个不同决策j，k (j,k &amp;lt; i)，若a[j] &amp;lt; a[k]，d[j] &amp;gt;= d[k]，而a[i] &amp;gt; a[k]时，k显然没有">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2018-05-17T09:43:45.581Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="LIS的O(nlogn)实现原理">
-<meta name="twitter:description" content="朴素的LIS的O(n²)算法是用dp，用d[i]表示a[i]中以i为结尾的LIS的值，那么状态转移方程可表示为d[i] = max{d[j] | j &amp;lt; i &amp;amp;&amp;amp; a[j] &amp;lt; a[i]} + 1。显然，对于一个i下的两个不同决策j，k (j,k &amp;lt; i)，若a[j] &amp;lt; a[k]，d[j] &amp;gt;= d[k]，而a[i] &amp;gt; a[k]时，k显然没有">
+<meta name="twitter:title" content="ljm&#39;s blog">
 
 
 
@@ -145,13 +140,13 @@
 
 
 
-  <link rel="canonical" href="https://mingming97.github.io/2017/08/30/LIS-O-nlogn/"/>
+  <link rel="canonical" href="https://mingming97.github.io/categories/NLP/"/>
 
 
 
 
 
-  <title>LIS的O(nlogn)实现原理 | ljm's blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <title>分类: NLP | ljm's blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
   
 
 
@@ -175,7 +170,7 @@
   color="0,0,255" opacity="0.3" zIndex="-1" count="30" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
   
 
-  <div class="container sidebar-position-left page-post-detail">
+  <div class="container sidebar-position-left ">
     <div class="headband"></div>
 
     <a href="https://github.com/mingming97"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a> 
@@ -291,209 +286,55 @@
           <div id="content" class="content">
             
 
-  <div id="posts" class="posts-expand">
-    
+  
+  
+  
+  <div class="post-block category">
 
-  
+    <div id="posts" class="posts-collapse">
+      <div class="collection-title">
+        <h1>NLP<small>分类</small>
+        </h1>
+      </div>
 
-  
-  
-  
+      
+        
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://mingming97.github.io/2017/08/30/LIS-O-nlogn/">
+    <header class="post-header">
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="ljm">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ljm's blog">
-    </span>
-
-    
-      <header class="post-header">
-
+      <h2 class="post-title">
         
+            <a class="post-title-link" href="/2018/05/17/chinese-split-word/" itemprop="url">
+              
+                <span itemprop="name">中文分词</span>
+              
+            </a>
         
-          <h1 class="post-title" itemprop="name headline">LIS的O(nlogn)实现原理</h1>
-        
+      </h2>
 
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-30T16:07:39+08:00">
-                2017-08-30
-              </time>
-            
+      <div class="post-meta">
+        <time class="post-time" itemprop="dateCreated"
+              datetime="2018-05-17T17:40:01+08:00"
+              content="2018-05-17" >
+          05-17
+        </time>
+      </div>
 
-            
-
-            
-          </span>
-
-          
-            <span class="post-category" >
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/算法/" itemprop="url" rel="index">
-                    <span itemprop="name">算法</span>
-                  </a>
-                </span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-            <div class="post-wordcount">
-              
-                
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-file-word-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">字数统计&#58;</span>
-                
-                <span title="字数统计">
-                  365
-                </span>
-              
-
-              
-                <span class="post-meta-divider">|</span>
-              
-
-              
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-clock-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
-                
-                <span title="阅读时长">
-                  2
-                </span>
-              
-            </div>
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        <p>朴素的LIS的<strong>O(n²)<strong>算法是用dp，用d[i]表示a[i]中以i为结尾的LIS的值，那么状态转移方程可表示为</strong>d[i] = max{d[j] | j &lt; i &amp;&amp; a[j] &lt; a[i]} + 1</strong>。显然，对于一个i下的两个不同决策<strong>j，k (j,k &lt; i)，若a[j] &lt; a[k]，d[j] &gt;= d[k]，而a[i] &gt; a[k]时，k显然没有j决策更优</strong>。通过这种思想，我们发现决策有一定的单调性，从而其中可以用二分查找来降低时间复杂度。</p>
-<h2 id="实现原理"><a class="markdownIt-Anchor" href="#实现原理"></a> 实现原理</h2>
-<p>我们可以维护一个决策序列B，用<strong>B[i]<strong>表示子序列长度为i时的最小末尾(a中的值)。可以看出如果</strong>i &gt; j</strong>，一定有<strong>B[i] &gt;= B[j]</strong>。原因很简单，看B的定义就可以知道。由上可知B是单调的序列，对于其中的的值可以进行二分查找。</p>
-<p>所以可以按顺序枚举<strong>a[i]</strong>，如果**a[i]<strong>的值比B中的最大值要大，则将</strong>a[i]<strong>放入</strong>B[i]<strong>的尾部，最大长度加1; 否则对B进行二分查找以找到</strong>a[i]**该放入的位置，<strong>pos = min{j | B[j] &gt; a[i]}</strong>，用a[i]代替B[pos]，使a[i]成为子序列长度为pos时的最小值。大致过程如下：</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">1</span>; i&lt;n; i++) &#123;</div><div class="line">    <span class="keyword">if</span> (a[i] &gt; B[len<span class="number">-1</span>]) &#123;</div><div class="line">        B[len] = a[i];</div><div class="line">        len++;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">else</span> &#123;</div><div class="line">        pos = binarySearch(len, a[i]);</div><div class="line">        B[pos] = a[i];</div><div class="line">    &#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<p>完整代码请戳：<a href="https://github.com/mingming97/Algorithms/blob/master/c%2B%2B/LIS-nlogn.cpp" target="_blank" rel="external">ljm’s github</a></p>
-
-      
-    </div>
-    
-    
-    
-
-    
-
-    
-
-    
-
-    <footer class="post-footer">
-      
-        <div class="post-tags">
-          
-            <a href="/tags/dp/" rel="tag"><i class="fa fa-tag"></i> dp</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2017/08/28/Union-Find/" rel="next" title="并查集">
-                <i class="fa fa-chevron-left"></i> 并查集
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2018/05/15/hexo-latex/" rel="prev" title="hexo配置LaTeX公式">
-                hexo配置LaTeX公式 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
+    </header>
   </article>
 
 
-
-    <div class="post-spread">
       
     </div>
+
   </div>
+  
+  
+  
+
+  
+
 
 
           </div>
@@ -501,10 +342,6 @@
 
 
           
-  <div class="comments" id="comments">
-    
-  </div>
-
 
         </div>
         
@@ -525,17 +362,8 @@
       
 
       
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview">
-            站点概览
-          </li>
-        </ul>
-      
 
-      <section class="site-overview sidebar-panel">
+      <section class="site-overview sidebar-panel sidebar-panel-active">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
                src="http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg"
@@ -619,22 +447,6 @@
 
       </section>
 
-      
-      <!--noindex-->
-        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-              
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现原理"><span class="nav-number">1.</span> <span class="nav-text"> 实现原理</span></a></li></ol></div>
-            
-
-          </div>
-        </section>
-      <!--/noindex-->
       
 
       
@@ -776,10 +588,10 @@
 
 
   
-  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+    <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
 <script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
 
-
+  
 
   
 
