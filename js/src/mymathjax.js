@@ -1,0 +1,1 @@
+$(".uncramped").css('display', 'none');
