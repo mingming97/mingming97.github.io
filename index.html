@@ -386,7 +386,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  930
+                  792
                 </span>
               
 
@@ -402,7 +402,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  4
+                  3
                 </span>
               
             </div>
@@ -425,8 +425,7 @@
       
         
           
-           基本思想
-  中文分词其实有很多种思路，大多都是建立在HMM模型的基础上。先简要介绍一下HMM模型，HMM模型中有三个要素：A是状态转移概率分布矩阵，简单说就是在任一时刻从一个隐含状态到另一个隐含状态的转移概率构成的矩阵；B是观测概率分布矩阵，其实就是在任一时刻给定隐含状态s生成观测状态o的条件概
+          基本思想&emsp;&emsp;中文分词其实有很多种思路，大多都是建立在HMM模型的基础上。先简要介绍一下HMM模型，HMM模型中有三个要素：A是状态转移概率分布矩阵，简单说就是在任一时刻从一个隐含状态到另一个隐含状态的转移概率构成的矩阵；B是观测概率分布矩阵，其实就是在任一时刻给定隐含状态s生成观
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -566,7 +565,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  203
+                  222
                 </span>
               
 
@@ -605,8 +604,8 @@
       
         
           
-            正常的hexo框架在默认情况下渲染数学公式会有很多问题，可以通过将hexo默认的引擎“hexo-renderer-marked”更换为“hexo-renderer-markdown-it-plus”来渲染markdown。
-  首先要将之前的“hexo-renderer-marked”卸载，并安
+          &emsp;&emsp;正常的hexo框架在默认情况下渲染数学公式会有很多问题，可以通过将hexo默认的引擎1&amp;emsp;&amp;emsp;首先要将之前的```hexo-renderer-marked```卸载，并安装```hexo-renderer-kramed```。
+npm unin
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -785,7 +784,7 @@
       
         
           
-          朴素的LIS的O(n²)算法是用dp，用d[i]表示a[i]中以i为结尾的LIS的值，那么状态转移方程可表示为d[i] = max{d[j] | j &lt; i &amp;&amp; a[j] &lt; a[i]} + 1。显然，对于一个i下的两个不同决策j，k (j,k &lt; i)，若a[j
+          　　朴素的LIS的O(n²)算法是用dp，用d[i]表示a[i]中以i为结尾的LIS的值，那么状态转移方程可表示为d[i] = max{d[j] | j &lt; i &amp;&amp; a[j] &lt; a[i]} + 1。显然，对于一个i下的两个不同决策j，k (j,k &lt; i)，若a
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -925,7 +924,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  864
+                  860
                 </span>
               
 
@@ -964,7 +963,7 @@
       
         
           
-          首先假设一个情景，一个班级上有很多学习小组，假如Alice，Amy等以A为首字母的属于一个小组，Bob，Ben等以B为首字母的属于一个小组，以此类推。 我们如果想快速查询任意两个人是否属于一个集合（不以首字母为依据），或者将两个学习小组合并为一个，用何种数据结构去组织最快呢。并查集是一种轻量级的数据
+          　　首先假设一个情景，一个班级上有很多学习小组，假如Alice，Amy等以A为首字母的属于一个小组，Bob，Ben等以B为首字母的属于一个小组，以此类推。 我们如果想快速查询任意两个人是否属于一个集合（不以首字母为依据），或者将两个学习小组合并为一个，用何种数据结构去组织最快呢。并查集是一种轻量级的
           ...
           <!--noindex-->
           <div class="post-button text-center">
@@ -1269,7 +1268,7 @@
   
 
 
-  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
 
 
 
@@ -1315,6 +1314,28 @@
   
 
   
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
 
   
 
