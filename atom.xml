@@ -55,11 +55,11 @@
     <link href="https://mingming97.github.io/2018/05/15/hexo-latex/"/>
     <id>https://mingming97.github.io/2018/05/15/hexo-latex/</id>
     <published>2018-05-15T13:12:18.000Z</published>
-    <updated>2018-05-18T10:00:50.315Z</updated>
+    <updated>2018-05-18T10:05:51.895Z</updated>
     
     <content type="html"><![CDATA[<p>&emsp;&emsp;正常的hexo框架在默认情况下渲染数学公式会有很多问题，可以通过将hexo默认的引擎 <code>hexo-renderer-marked</code>更换为<code>hexo-renderer-kramed</code>来渲染markdown。<br>&emsp;&emsp;首先要将之前的<code>hexo-renderer-marked</code>卸载，并安装<code>hexo-renderer-kramed</code>。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">npm uninstall hexo-renderer-marked --save</div><div class="line">npm install hexo-renderer-kramed --save</div></pre></td></tr></table></figure></p>
-<p>&emsp;&emsp;在这之后建议在hexo的根目录下找到<code>package.json</code>文件，用文本编辑器打开它，删除字符串<code>hexo-renderer-marked</code>所在的一行并保存。之所以不直接卸载<code>hexo-renderer-marked</code>，是因为其他重要包极有可能在卸载该包的同时被删除。<br>&emsp;&emsp;不要忘了行内公式的转义字符，打开<code>./node_modules/kramed/lib/rules</code>，并修改<code>inline.js</code>文件的11和20行，分别修改为<code>escape: /^\\([\</code><em>[]()#$+-.!_&gt;])/,<code>和</code>em: /^\</em>((?:**|[\s\S])+?)*(?!*)/,<code>。
-&amp;emsp;&amp;emsp;每次在写文章前，要在YAML font-matter中添加</code>mathjax: true`，这样便能确保启动mathjax引擎进行渲染了。</p>
+<p>&emsp;&emsp;在这之后建议在hexo的根目录下找到<code>package.json</code>文件，用文本编辑器打开它，删除字符串<code>hexo-renderer-marked</code>所在的一行并保存。之所以不直接卸载<code>hexo-renderer-marked</code>，是因为其他重要包极有可能在卸载该包的同时被删除。<br>&emsp;&emsp;不要忘了行内公式的转义字符，打开<code>./node_modules/kramed/lib/rules</code>，并修改<code>inline.js</code>文件的11和20行，分别修改为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">escape: /^\\([`*\[\]()#$+\-.!_&gt;])/,</div><div class="line">em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,</div></pre></td></tr></table></figure></p>
+<p>&emsp;&emsp;每次在写文章前，要在YAML font-matter中添加<code>mathjax: true</code>，这样便能确保启动mathjax引擎进行渲染了。</p>
 ]]></content>
     
     <summary type="html">
