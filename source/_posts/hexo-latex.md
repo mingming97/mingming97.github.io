@@ -13,6 +13,10 @@ npm uninstall hexo-renderer-marked --save
 npm install hexo-renderer-kramed --save
 ```
 &emsp;&emsp;在这之后建议在hexo的根目录下找到`package.json`文件，用文本编辑器打开它，删除字符串`hexo-renderer-marked`所在的一行并保存。之所以不直接卸载`hexo-renderer-marked`，是因为其他重要包极有可能在卸载该包的同时被删除。 
-&emsp;&emsp;不要忘了行内公式的转义字符，打开`./node_modules/kramed/lib/rules`，并修改`inline.js`文件的11和20行，分别修改为`escape: /^\\([\`*\[\]()#$+\-.!_>])/,` 和 `em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,`。
+&emsp;&emsp;不要忘了行内公式的转义字符，打开`./node_modules/kramed/lib/rules`，并修改`inline.js`文件的11和20行，分别修改为
+```
+escape: /^\\([`*\[\]()#$+\-.!_>])/,
+em: /^\*((?:\*\*|[\s\S])+?)\*(?!\*)/,
+```
 &emsp;&emsp;每次在写文章前，要在YAML font-matter中添加`mathjax: true`，这样便能确保启动mathjax引擎进行渲染了。
 
