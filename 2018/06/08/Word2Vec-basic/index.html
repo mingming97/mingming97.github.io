@@ -115,7 +115,9 @@
 <meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/network.png">
 <meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOW-Architecture.jpg">
 <meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOWmodel.png">
-<meta property="og:updated_time" content="2018-06-12T06:25:22.959Z">
+<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/Skip-Gram-Architecture-26.jpg">
+<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/SKIPGRAMmodel.png">
+<meta property="og:updated_time" content="2018-06-12T11:39:56.652Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="word2vec理解">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;本文需要对n-gram模型在评估语句上的应用有一定了解（n-gram还有一些其他应用，如模糊匹配、特征工程等），可以看作对word2vec 中的数学原理详解这篇博文的一些思考。 &amp;emsp;&amp;emsp;首先一定要建立起word2vec的基本认识，在NLP的一些任务中，我们需要将自然语言进行处理并发现其中的规律。但是机器没有办法直接理解自然语言，这就需要我们将其抽象化，换成一">
@@ -392,7 +394,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  1,508
+                  2,036
                 </span>
               
 
@@ -408,7 +410,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  6
+                  8
                 </span>
               
             </div>
@@ -468,9 +470,9 @@ p(d_j|x_w, \theta_{j-1}) = \left[\sigma(x_w^T\theta_{j-1})\right]^{1-d_j}\cdot\l
 p(w|Context(w))=\displaystyle\prod_{j=2}^{s}p(d_j|x_w, \theta_{j-1})</script><p>为了方便计算取对数，表示如下</p>
 <script type="math/tex; mode=display">
 \begin{align}
-L &= \displaystyle\sum_{w\in C}log\prod_{j=2}^{s_w}\left\{p(d_j^w|x_w, \theta_{j-1}^w)\right\} \\
-&=\displaystyle\sum_{w \in C}\sum_{j=2}^{s}\left\{(1-d_j^w)log\left[\sigma(x_w^T\theta_{j-1}^w)\right]+d_j^wlog\left[1-\sigma(x_w^T\theta_{j-1}^w)\right]\right\}
-\end{align}</script><p>以上就是CBOW的目标函数，注意d和$\theta$都有上标的原因是表示他们是$w$相关的。由于我们的目标是将这个函数最大化，所以要用Gradient Ascent。对于我们的整个模型，需要训练的参数有$\theta_{j-1}^w,x_w$，分别对他们求梯度，为方便计算，将大花括号中的内容记作T。</p>
+L &= \displaystyle\sum_{w\in C}log\prod_{j=2}^{s_w}\left[p(d_j^w|x_w, \theta_{j-1}^w)\right] \\
+&=\displaystyle\sum_{w \in C}\sum_{j=2}^{s_w}\left\{(1-d_j^w)log\left[\sigma(x_w^T\theta_{j-1}^w)\right]+d_j^wlog\left[1-\sigma(x_w^T\theta_{j-1}^w)\right]\right\}
+\end{align}</script><p>以上就是CBOW的目标函数，注意d和$\theta$都有上标的原因是表示他们是$w$相关的。由于我们的目标是将这个函数最大化，所以要用Gradient Ascent。对于我们的整个模型，需要训练的参数有$\theta_{j-1}^w,x_w$，分别对他们求梯度，由于是加法，又由于对一个固定的w和j，对$\theta_j^w$求偏导有贡献的项仅仅有花括号中的w和j相同的对应项，而对$x_w$而言有贡献的是$j\in[2, s_w]$部分的花括号中的内容的偏导和，为方便计算，将花括号中的内容记作T。</p>
 <script type="math/tex; mode=display">
 \begin{align}
 \frac{\partial T}{\partial\theta_{j-1}^w} &= \displaystyle\frac{\partial}{\partial\theta_{j-1}^w}\left\{(1-d_j^w)log\left[\sigma(x_w^T\theta_{j-1}^w)\right]+d_j^wlog\left[1-\sigma(x_w^T\theta_{j-1}^w)\right]\right\}\\
@@ -495,7 +497,57 @@ for \ j \leftarrow2\ to\ s_w\ do\\
 \ \ \ \ \ \ \ \ \ \theta_{j-1}^w\leftarrow \theta_{j-1}^w+gx_w\\
 end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
 \ \ \ \ \ \ for \ u \in Context(w) do\\
-\ \ \ \ \ \ v(u) \leftarrow v(u) + e</script><h2 id=""><a href="#" class="headerlink" title=" "></a> </h2>
+\ \ \ \ \ \ v(u) \leftarrow v(u) + e</script><h2 id="Skip-gram"><a href="#Skip-gram" class="headerlink" title="Skip-gram"></a>Skip-gram</h2><p>&emsp;&emsp;与CBOW相反，这个模型要解决的问题是在已知词$w_t$的情况下，预测词$w_{t-2}, w_{t-1},w_{t+1},w_{t+2}$。也就是要计算$P(Context(w_t)|w_t)$，如下图所示：</p>
+<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/Skip-Gram-Architecture-26.jpg" alt=""></p>
+<p>&emsp;&emsp;对于其模型，与CBOW模型类似，为了与其对比，保留了projection layer，如下：</p>
+<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/SKIPGRAMmodel.png" alt=""></p>
+<ul>
+<li><p>输入层：词向量$v(w)$</p>
+</li>
+<li><p>投影层：为了与CBOW保持类似保留的，无实际作用。</p>
+</li>
+<li><p>输出层：一棵Huffman树。与CBOW类似，也是为了利用Hierarchical softmax，所输出的一棵以单词为叶子节点，非叶子节点作为二分类的单元的哈夫曼树。</p>
+</li>
+</ul>
+<p>如何表示$P(Context(w)|w)$呢，可以将其拆解如下：</p>
+<script type="math/tex; mode=display">
+p(Context(w)|w) = \displaystyle\prod_{u \in Context(w)}p(u|w)</script><p>此处的$p(u|w)$可以借助CBOW的表示方式，表示为：</p>
+<script type="math/tex; mode=display">
+p(u|w) = \displaystyle\prod_{j=2}^{s}p(d_j|v_w, \theta_{j-1})</script><p>此处的$\theta,d_j$在总体表示中，同样是与语料中的$u$是相关的，将p写作二分类的形式后再取对数（与CBOW中操作相似），得到总体的目标函数</p>
+<script type="math/tex; mode=display">
+\begin{align}
+L&= \displaystyle\sum_{w\in C}log\prod_{u\in Context(w)}\prod_{j=2}^{s_u}\left[p(d_j^u|v_w,\theta_{j-1}^u)\right]\\
+&= \displaystyle\sum_{w \in C}\sum_{u\in Context(w)}\sum_{j=2}^{s_u} \left\{(1-d_j^u)log\left[\sigma(v_w^T\theta_{j-1}^u)\right]+d_j^ulog\left[1-\sigma(v_w^T\theta_{j-1}^u)\right]\right\}
+\end{align}</script><p>出于与CBOW中同样的考虑，可将后面花括号中的内容记为T，与CBOW中推导过程完全相同，得到下面的结果：</p>
+<script type="math/tex; mode=display">
+\displaystyle\frac{\partial T}{\partial\theta_{j-1}^u} =\left[(1-d_j^u-\sigma(v_w^T\theta_{j-1}^u)\right]v_w</script><script type="math/tex; mode=display">
+\displaystyle\frac{\partial T}{\partial v_w}=\left[(1-d_j^u-\sigma(v_w^T\theta_{j-1}^u)\right]\theta_{j-1}^u</script><p> 参数更新也是类似的（此处也是要求目标函数最大值）</p>
+<script type="math/tex; mode=display">
+\theta_{j-1}^u \leftarrow \theta_{j-1}^u + \eta\left[(1-d_j^u-\sigma(v_w^T\theta_{j-1}^u)\right]v_w</script><script type="math/tex; mode=display">
+v_w\leftarrow v_w + \eta\displaystyle\sum_{u\in Context(w)}\sum_{j=2}^{s_u}\left[(1-d_j^u-\sigma(v_w^T\theta_{j-1}^u)\right]\theta_{j-1}^u</script><p>综上对于一个训练样本$(w, Context(w))$，Skip-gram伪代码如下</p>
+<script type="math/tex; mode=display">
+e\leftarrow 0\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
+for\ u \in Context(w)\ do \\
+for \ j \leftarrow2\ to\ s_u\ do\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ q \leftarrow \sigma\left[v(w)^T\theta_{j-1}^u\right]\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ g \leftarrow\eta(1-d_j^u-q)\\
+\ \ \ \ \ \ \ \ e\leftarrow e + g\theta_{j-1}^u\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \theta_{j-1}^u\leftarrow \theta_{j-1}^u+gv(w)\\
+end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
+end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
+v(w) \leftarrow v(w)+e\ \ \ \ \ \ \ \ \ \ \ \</script><p>但是在word2vec中，真实的做法是每处理一个$Context(w)$中的词，就进行一次更新，也就是如下的步骤：</p>
+<script type="math/tex; mode=display">
+for\ u \in Context(w)\ do \\
+e\leftarrow 0\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
+for \ j \leftarrow2\ to\ s_u\ do\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ q \leftarrow \sigma\left[v(w)^T\theta_{j-1}^u\right]\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ g \leftarrow\eta(1-d_j^u-q)\\
+\ \ \ \ \ \ \ \ e\leftarrow e + g\theta_{j-1}^u\\
+\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \theta_{j-1}^u\leftarrow \theta_{j-1}^u+gv(w)\\
+end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
+v(w) \leftarrow v(w)+e\ \ \ \\
+end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\</script><p>&emsp;&emsp;以上两种就是基于Hierarchical softmax的CBOW和Skip-gram模型，还有基于Negative Sampling的两种模型，在这里暂且不提。如果想得知更多细节，可以在源码中获得，我个人只看过java版本的，没看过纯C版本的，尽管语言不同，但我想在一些处理细节上是相同的。</p>
+
       
     </div>
     
@@ -689,7 +741,7 @@ end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络语言模型"><span class="nav-number">1.</span> <span class="nav-text">神经网络语言模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CBOW"><span class="nav-number">2.</span> <span class="nav-text">CBOW</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#"><span class="nav-number">3.</span> <span class="nav-text"> </span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#神经网络语言模型"><span class="nav-number">1.</span> <span class="nav-text">神经网络语言模型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CBOW"><span class="nav-number">2.</span> <span class="nav-text">CBOW</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Skip-gram"><span class="nav-number">3.</span> <span class="nav-text">Skip-gram</span></a></li></ol></div>
             
 
           </div>
