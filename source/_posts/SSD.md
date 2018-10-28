@@ -49,7 +49,10 @@ categories: CV
 
 - default box中心：default box的中心在计算的时候需要恢复为原图的相对坐标，所以每个中心设置为$\displaystyle\left(\frac{i+0.5}{|f_k|},\frac{j+0.5}{|f_k|}\right)\ \ i,j \in [0, |f_k|)$，其中$|f_k|$表示第k个feature map的大小。
 
+
+
 综上可以得到如下表格
+
 |feature map|feature map size|min_size($\textbf{s}_\textbf{k}$)|max_size($\textbf{s}_\textbf{k+1}$)|aspect_ratio|step|
 | :------: | :------: | :------: | :------: | :------: | :------: |
 | conv4_3 | 38$\times$38 | 30 |60|1,2,$\frac{1}{2}$|8|
@@ -58,6 +61,7 @@ categories: CV
 | conv9_2 | 5$\times$5 | 162 |213|1,2,3,$\frac{1}{2}$,$\frac{1}{3}$|64|
 | conv10_2 | 3$\times$3 | 213 |264|1,2,$\frac{1}{2}$|100|
 | conv11_2 | 1$\times$1 | 264 |315|1,2,$\frac{1}{2}$|300|
+
 
 
 
