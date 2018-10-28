@@ -39,7 +39,7 @@ categories: CV
   $$
   s_k = s_{min} + \displaystyle\frac{s_{max}-s_{min}}{m-1}(k-1),k\in[1,m]
   $$
-  其中m是特征图的个数，实际取的时候为5，因为conv4_3层是单独设置的大小。$s_k$是第k个特征图的scale，$s_{min}$和$s_{max}$表示scale的最小值和最大值，在原论文中分别取0.2和0.9，而第一个特征图的scale一般设为$s_{min}$的一半，为0.1，所以对于300$\times$300的图片，最小的比例为300*0.1=30，之后每个对应feature map所检测的default boxes的大小都是300\*$s_k$。在caffe源码中的计算是先给出了$s_k$的增长步长，也就是$\displaystyle \lfloor\frac{\lfloor s_{max}\times100\rfloor-\lfloor s_{min}\times100\rfloor}{m-1}\rfloor=17$，由此可以得到5个值分别为20，37，54，71，88（后面还会得到另一个虚拟值是88+17=105）。这些比例乘图片大小再除以100，就能得到各个特征图的大小分别为60，111，162，213，264。再结合最小比例，可以得到default boxes的实际尺度分别为30，60，111，162，213，264。
+  其中m是特征图的个数，实际取的时候为5，因为conv4_3层是单独设置的大小。$s_k$是第k个特征图的scale，$s_{min}$和$s_{max}$表示scale的最小值和最大值，在原论文中分别取0.2和0.9，而第一个特征图的scale一般设为$s_{min}$的一半，为0.1，所以对于300$\times$300的图片，最小的比例为300\*0.1=30，之后每个对应feature map所检测的default boxes的大小都是300\*$s_k$。在caffe源码中的计算是先给出了$s_k$的增长步长，也就是$\displaystyle \lfloor\frac{\lfloor s_{max}\times100\rfloor-\lfloor s_{min}\times100\rfloor}{m-1}\rfloor=17$，由此可以得到5个值分别为20，37，54，71，88（后面还会得到另一个虚拟值是88+17=105）。这些比例乘图片大小再除以100，就能得到各个特征图的大小分别为60，111，162，213，264。再结合最小比例，可以得到default boxes的实际尺度分别为30，60，111，162，213，264。
 
 - aspect ratio：aspect ratio指的是default boxes的横纵比，一般有$\displaystyle a_r \in \{1,2,3,\frac{1}{2},\frac{1}{3}\}$，对于特定的横纵比，会使用
   $$
