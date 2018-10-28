@@ -1,7 +1,7 @@
 ---
 title: SSD源码阅读及原理详解
 date: 2018-10-21 15:08:00
-tags: [CV]
+tags: [CV,Object Detection]
 mathjax: true
 categories: CV
 ---
