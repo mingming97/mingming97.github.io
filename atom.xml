@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mingming97.github.io/"/>
-  <updated>2018-10-28T06:45:48.747Z</updated>
+  <updated>2018-10-28T06:58:07.967Z</updated>
   <id>https://mingming97.github.io/</id>
   
   <author>
@@ -20,7 +20,7 @@
     <link href="https://mingming97.github.io/2018/10/21/SSD/"/>
     <id>https://mingming97.github.io/2018/10/21/SSD/</id>
     <published>2018-10-21T07:08:00.000Z</published>
-    <updated>2018-10-28T06:45:48.747Z</updated>
+    <updated>2018-10-28T06:58:07.967Z</updated>
     
     <content type="html"><![CDATA[<p>&emsp;&emsp;本文阅读的版本是tensorflow对SSD的实现，相对而言阅读难度要远低于caffe版本的实现，源代码可见<a href="https://github.com/balancap/SSD-Tensorflow/" target="_blank" rel="external">balancap/SSD-Tensorflow</a>。</p>
 <h2 id="一、思路"><a href="#一、思路" class="headerlink" title="一、思路"></a>一、思路</h2><p>&emsp;&emsp;SSD的网络结构在论文中清晰可见，如图所示。具体是使用了VGG的基础结构，保留了前五层，将fc6和fc7改为了带孔卷积层，而且去掉了池化层和dropout，在不增加参数的条件下指数级扩大了感受野，而且没有因为池化导致丢失太多的信息；后面再额外增加了3个卷积层和一个average pooling层，目的是使用不同层的feature map来检测不同尺度的物体。之后从前面的卷积层中提取了conv4_3，从后面新增的卷积层中提取了conv7，conv8_2，conv9_2，conv10_2，conv11_2来作为检测使用的特征图，在这些不同尺度特征图上提取不同数目的default boxes，对其进行分类和边框回归得到物体框和类别，最后进行nms来进行筛选。简而言之，SSD预测的目标就是以一张图中的所有提取出的anchor boxes为窗口，检测其中是否有物体，如果有，预测它的类别并对其位置进行精修，没有物体则将其分类为背景。</p>
@@ -37,7 +37,7 @@
 <ul>
 <li><p>scale：scale指的是所检测的框的大小相对于原图的比例。比例低的可以框出图中的小物体，比例高的可以框出图中的大物体。深层次的feature map适合检测大物体，所以此处使用了一个线性关系来设置各个feature map所检测的scale。公式如下</p>
 <script type="math/tex; mode=display">
-s_k = s_{min} + \displaystyle\frac{s_{max}-s_{min}}{m-1}(k-1),k\in[1,m]</script><p>其中m是特征图的个数，实际取的时候为5，因为conv4_3层是单独设置的大小。$s_k$是第k个特征图的scale，$s_{min}$和$s_{max}$表示scale的最小值和最大值，在原论文中分别取0.2和0.9，而第一个特征图的scale一般设为$s_{min}$的一半，为0.1，所以对于300$\times$300的图片，最小的比例为300<em>0.1=30，之后每个对应feature map所检测的default boxes的大小都是300\</em>$s_k$。在caffe源码中的计算是先给出了$s_k$的增长步长，也就是$\displaystyle \lfloor\frac{\lfloor s_{max}\times100\rfloor-\lfloor s_{min}\times100\rfloor}{m-1}\rfloor=17$，由此可以得到5个值分别为20，37，54，71，88（后面还会得到另一个虚拟值是88+17=105）。这些比例乘图片大小再除以100，就能得到各个特征图的大小分别为60，111，162，213，264。再结合最小比例，可以得到default boxes的实际尺度分别为30，60，111，162，213，264。</p>
+s_k = s_{min} + \displaystyle\frac{s_{max}-s_{min}}{m-1}(k-1),k\in[1,m]</script><p>其中m是特征图的个数，实际取的时候为5，因为conv4_3层是单独设置的大小。$s_k$是第k个特征图的scale，$s_{min}$和$s_{max}$表示scale的最小值和最大值，在原论文中分别取0.2和0.9，而第一个特征图的scale一般设为$s_{min}$的一半，为0.1，所以对于300$\times$300的图片，最小的比例为300*0.1=30，之后每个对应feature map所检测的default boxes的大小都是300*$s_k$。在caffe源码中的计算是先给出了$s_k$的增长步长，也就是$\displaystyle \lfloor\frac{\lfloor s_{max}\times100\rfloor-\lfloor s_{min}\times100\rfloor}{m-1}\rfloor=17$，由此可以得到5个值分别为20，37，54，71，88（后面还会得到另一个虚拟值是88+17=105）。这些比例乘图片大小再除以100，就能得到各个特征图的大小分别为60，111，162，213，264。再结合最小比例，可以得到default boxes的实际尺度分别为30，60，111，162，213，264。</p>
 </li>
 <li><p>aspect ratio：aspect ratio指的是default boxes的横纵比，一般有$\displaystyle a_r \in \{1,2,3,\frac{1}{2},\frac{1}{3}\}$，对于特定的横纵比，会使用</p>
 <script type="math/tex; mode=display">
