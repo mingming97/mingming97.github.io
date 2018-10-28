@@ -2,16 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://mingming97.github.io/2018/10/21/SSD/</loc>
+    
+    <lastmod>2018-10-28T06:45:48.747Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mingming97.github.io/2018/06/08/Word2Vec-basic/</loc>
     
-    <lastmod>2018-06-12T11:39:56.652Z</lastmod>
+    <lastmod>2018-06-12T11:41:07.971Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://mingming97.github.io/2018/05/15/hexo-latex/</loc>
     
-    <lastmod>2018-05-18T10:05:51.895Z</lastmod>
+    <lastmod>2018-05-18T10:11:23.240Z</lastmod>
     
   </url>
   
@@ -44,16 +51,16 @@
   </url>
   
   <url>
-    <loc>https://mingming97.github.io/categories/index.html</loc>
+    <loc>https://mingming97.github.io/tags/index.html</loc>
     
-    <lastmod>2017-08-29T04:50:05.078Z</lastmod>
+    <lastmod>2018-05-16T14:58:41.546Z</lastmod>
     
   </url>
   
   <url>
-    <loc>https://mingming97.github.io/tags/index.html</loc>
+    <loc>https://mingming97.github.io/categories/index.html</loc>
     
-    <lastmod>2017-08-29T04:49:39.043Z</lastmod>
+    <lastmod>2018-05-16T14:58:25.083Z</lastmod>
     
   </url>
   
