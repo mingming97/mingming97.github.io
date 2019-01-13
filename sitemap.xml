@@ -2,16 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://mingming97.github.io/2018/10/21/SSD/</loc>
+    <loc>https://mingming97.github.io/2018/05/17/chinese-split-word/</loc>
     
-    <lastmod>2018-10-28T06:58:07.967Z</lastmod>
+    <lastmod>2019-01-13T08:37:19.853Z</lastmod>
     
   </url>
   
   <url>
     <loc>https://mingming97.github.io/2018/06/08/Word2Vec-basic/</loc>
     
-    <lastmod>2018-06-12T11:41:07.971Z</lastmod>
+    <lastmod>2019-01-13T08:36:11.331Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://mingming97.github.io/2018/10/21/SSD/</loc>
+    
+    <lastmod>2019-01-13T08:33:27.593Z</lastmod>
     
   </url>
   
@@ -19,13 +26,6 @@
     <loc>https://mingming97.github.io/2018/05/15/hexo-latex/</loc>
     
     <lastmod>2018-05-18T10:11:23.240Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://mingming97.github.io/2018/05/17/chinese-split-word/</loc>
-    
-    <lastmod>2018-05-18T09:51:04.149Z</lastmod>
     
   </url>
   

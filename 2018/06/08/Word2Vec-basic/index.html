@@ -112,16 +112,16 @@
 <meta property="og:site_name" content="ljm&#39;s blog">
 <meta property="og:description" content="&amp;emsp;&amp;emsp;本文需要对n-gram模型在评估语句上的应用有一定了解（n-gram还有一些其他应用，如模糊匹配、特征工程等），可以看作对word2vec 中的数学原理详解这篇博文的一些思考。 &amp;emsp;&amp;emsp;首先一定要建立起word2vec的基本认识，在NLP的一些任务中，我们需要将自然语言进行处理并发现其中的规律。但是机器没有办法直接理解自然语言，这就需要我们将其抽象化，换成一">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/network.png">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOW-Architecture.jpg">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOWmodel.png">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/Skip-Gram-Architecture-26.jpg">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/SKIPGRAMmodel.png">
-<meta property="og:updated_time" content="2018-06-12T11:41:07.971Z">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af82c18641.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af82bcf170.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af82be502d.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af82bd993d.jpg">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af82c03dcc.png">
+<meta property="og:updated_time" content="2019-01-13T08:36:11.331Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="word2vec理解">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;本文需要对n-gram模型在评估语句上的应用有一定了解（n-gram还有一些其他应用，如模糊匹配、特征工程等），可以看作对word2vec 中的数学原理详解这篇博文的一些思考。 &amp;emsp;&amp;emsp;首先一定要建立起word2vec的基本认识，在NLP的一些任务中，我们需要将自然语言进行处理并发现其中的规律。但是机器没有办法直接理解自然语言，这就需要我们将其抽象化，换成一">
-<meta name="twitter:image" content="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/network.png">
+<meta name="twitter:image" content="https://i.loli.net/2019/01/13/5c3af82c18641.png">
 
 
 
@@ -316,7 +316,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="ljm">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg">
+      <meta itemprop="image" content="https://avatars2.githubusercontent.com/u/30823593?s=400&v=4">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -442,12 +442,12 @@
 <li><p>输出层（Outpu Layer）：输出层的结点数与词典的大小相同，代表下一个词是词典中某一个词的概率。按照图中所说就是$O = softmax(UZ + q)$。其中U为该层权重，q是bias，softmax是activation function。</p>
 </li>
 </ul>
-<p>  <img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/network.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82c18641.png" alt="network.png"></p>
 <p>  &emsp;&emsp;之后要介绍的网络都建立在这个三层模型的基础上，只是对一些流程做出了改动。</p>
 <h2 id="CBOW"><a href="#CBOW" class="headerlink" title="CBOW"></a>CBOW</h2><p>&emsp;&emsp;这个模型要解决的问题其实就是在知道当前词$w_t$的上下文$w_{t-2},w_{t-1},w_{t+1},w_{t+2}$的情况下，预测$w_t$。也就是要计算$P(w_t|context(w_t))$。大体如下图所示：</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOW-Architecture.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82bcf170.jpg" alt="CBOW-Architecture.jpg"></p>
 <p>&emsp;&emsp;对于其模型而言，去掉了之前的Hidden Layer，增加了一个Projection Layer，之前是将所有向量拼接，而现在是将所有向量求和，减少了参数数目，大体的模型如下。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOWmodel.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82be502d.png" alt="CBOWmodel.png"></p>
 <ul>
 <li><p>输入层：$Context(w)$中2c个词的词向量。</p>
 </li>
@@ -498,9 +498,9 @@ for \ j \leftarrow2\ to\ s_w\ do\\
 end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
 \ \ \ \ \ \ for \ u \in Context(w) do\\
 \ \ \ \ \ \ v(u) \leftarrow v(u) + e</script><h2 id="Skip-gram"><a href="#Skip-gram" class="headerlink" title="Skip-gram"></a>Skip-gram</h2><p>&emsp;&emsp;与CBOW相反，这个模型要解决的问题是在已知词$w_t$的情况下，预测词$w_{t-2}, w_{t-1},w_{t+1},w_{t+2}$。也就是要计算$P(Context(w_t)|w_t)$，如下图所示：</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/Skip-Gram-Architecture-26.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82bd993d.jpg" alt="Skip-Gram-Architecture-26.jpg"></p>
 <p>&emsp;&emsp;对于其模型，与CBOW模型类似，为了与其对比，保留了projection layer，如下：</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/SKIPGRAMmodel.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82c03dcc.png" alt="SKIPGRAMmodel.png"></p>
 <ul>
 <li><p>输入层：词向量$v(w)$</p>
 </li>
@@ -654,7 +654,7 @@ end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\</scrip
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg"
+               src="https://avatars2.githubusercontent.com/u/30823593?s=400&v=4"
                alt="ljm" />
           <p class="site-author-name" itemprop="name">ljm</p>
            
@@ -770,7 +770,7 @@ end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\</scrip
 <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <!--<i class="fa fa-heart"></i> -->
     <i class="fa fa-cog" aria-hidden="true"></i>

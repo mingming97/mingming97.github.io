@@ -112,20 +112,20 @@
 <meta property="og:site_name" content="ljm&#39;s blog">
 <meta property="og:description" content="&amp;emsp;&amp;emsp;本文阅读的版本是tensorflow对SSD的实现，相对而言阅读难度要远低于caffe版本的实现，源代码可见balancap/SSD-Tensorflow。 一、思路&amp;emsp;&amp;emsp;SSD的网络结构在论文中清晰可见，如图所示。具体是使用了VGG的基础结构，保留了前五层，将fc6和fc7改为了带孔卷积层，而且去掉了池化层和dropout，在不增加参数的条件下指数级扩大">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/structure.png">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/ssdstruct.jpg">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/extrafeature.jpg">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes1.jpg">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes2.jpg">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes3.jpg">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/total_loss.png">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/conf_loss.png">
-<meta property="og:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/loc_loss.png">
-<meta property="og:updated_time" content="2018-10-28T06:58:07.967Z">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af67a3a0cf.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af67a838a7.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af67a2f47b.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af67a6a4ea.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af67a81572.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af67a7644c.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af679cd911.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af679a4ee9.png">
+<meta property="og:image" content="https://i.loli.net/2019/01/13/5c3af67a24d49.png">
+<meta property="og:updated_time" content="2019-01-13T08:33:27.593Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="SSD源码阅读及原理详解">
 <meta name="twitter:description" content="&amp;emsp;&amp;emsp;本文阅读的版本是tensorflow对SSD的实现，相对而言阅读难度要远低于caffe版本的实现，源代码可见balancap/SSD-Tensorflow。 一、思路&amp;emsp;&amp;emsp;SSD的网络结构在论文中清晰可见，如图所示。具体是使用了VGG的基础结构，保留了前五层，将fc6和fc7改为了带孔卷积层，而且去掉了池化层和dropout，在不增加参数的条件下指数级扩大">
-<meta name="twitter:image" content="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/structure.png">
+<meta name="twitter:image" content="https://i.loli.net/2019/01/13/5c3af67a3a0cf.png">
 
 
 
@@ -320,7 +320,7 @@
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="ljm">
       <meta itemprop="description" content="">
-      <meta itemprop="image" content="http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg">
+      <meta itemprop="image" content="https://avatars2.githubusercontent.com/u/30823593?s=400&v=4">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
@@ -437,16 +437,16 @@
       
         <p>&emsp;&emsp;本文阅读的版本是tensorflow对SSD的实现，相对而言阅读难度要远低于caffe版本的实现，源代码可见<a href="https://github.com/balancap/SSD-Tensorflow/" target="_blank" rel="external">balancap/SSD-Tensorflow</a>。</p>
 <h2 id="一、思路"><a href="#一、思路" class="headerlink" title="一、思路"></a>一、思路</h2><p>&emsp;&emsp;SSD的网络结构在论文中清晰可见，如图所示。具体是使用了VGG的基础结构，保留了前五层，将fc6和fc7改为了带孔卷积层，而且去掉了池化层和dropout，在不增加参数的条件下指数级扩大了感受野，而且没有因为池化导致丢失太多的信息；后面再额外增加了3个卷积层和一个average pooling层，目的是使用不同层的feature map来检测不同尺度的物体。之后从前面的卷积层中提取了conv4_3，从后面新增的卷积层中提取了conv7，conv8_2，conv9_2，conv10_2，conv11_2来作为检测使用的特征图，在这些不同尺度特征图上提取不同数目的default boxes，对其进行分类和边框回归得到物体框和类别，最后进行nms来进行筛选。简而言之，SSD预测的目标就是以一张图中的所有提取出的anchor boxes为窗口，检测其中是否有物体，如果有，预测它的类别并对其位置进行精修，没有物体则将其分类为背景。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/structure.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a3a0cf.png" alt="structure.png"></p>
 <p>&emsp;&emsp;通俗一点的思路如下面的两个图所示，SSD所做的其实就是将feature map用额外的两个卷积层去卷积得到分类评分和边框回归的偏移，其中k表示从该层feature的每个anchor处提取的不同default boxes的个数，这些词具体是什么可以在后面的代码细节中看到。其他的一些细节，例如数据增广，mining hard examples等，也都在代码中有体现。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/ssdstruct.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a838a7.png" alt="ssdstruct.png"></p>
 <p>下面是提取结果的卷积层的放大图。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/extrafeature.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a2f47b.png" alt="extrafeature.png"></p>
 <p>&emsp;&emsp;每个feature map可以分两条路，分别得到分类结果和回归结果，再通过已有的ground truth box及其类别得到每个default box的分类和边框偏移，就可以计算loss，进行训练了。</p>
 <h2 id="二、default-boxes提取"><a href="#二、default-boxes提取" class="headerlink" title="二、default boxes提取"></a>二、default boxes提取</h2><p>&emsp;&emsp;default boxes的选取与faster rcnn中的anchor有一些类似，就是按照不同的scale和ratio生成k个boxes，看下面的图就能大概了解其思想</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes1.jpg" alt=""></p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes2.jpg" alt=""></p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes3.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a6a4ea.png" alt="defaultboxes1.png"></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a81572.png" alt="defaultboxes2.png"></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a7644c.png" alt="defaultboxes3.png"></p>
 <ul>
 <li><p>scale：scale指的是所检测的框的大小相对于原图的比例。比例低的可以框出图中的小物体，比例高的可以框出图中的大物体。深层次的feature map适合检测大物体，所以此处使用了一个线性关系来设置各个feature map所检测的scale。公式如下</p>
 <script type="math/tex; mode=display">
@@ -590,13 +590,13 @@ w_k^a=s_k\sqrt{a_r}\ \ \ \ \ \ h_k^a=\displaystyle\frac{s_k}{\sqrt{a_r}}</script
 <p>&emsp;&emsp;<code>ssd_multibox_layer</code>同样定义于<code>ssd_vgg_300.py</code>中，可以看到一开始对normalization值进行了判断，此处就是<code>SSDParams</code>中<code>normalizations</code>的作用，在SSD中由于第一个要提取特征层较浅，其norm较大，所以要对其进行沿channel方向的l2_normalize，而其他层无需进行此操作，代码中也仅是判断了<code>normalization</code>的值是否大于0，所以在<code>normalizations</code>中第一个值大于0，其他都小于0，20和-1无实际含义。</p>
 <p>&emsp;&emsp;下面则是对location的计算，首先使用了一个3*3卷积，通道数是每个中心default box的个数乘4，代表y，x，w，h四个偏移，从而得到了每个中心的边框偏移的结果，此处又进行了一个reshape操作，其中<code>tensor_shape</code>得到<code>loc_pred</code>的形状，再通过切片将最后一维去掉，再加上两维，分别是每个中心default box的个数，和4，这样就得到了[batch_size,size[0],size[1],num_anchors,4]的tensor。以第二个特征层为例，<code>loc_pred</code>的形状为[batch_size,19,19,6,4]，同理可以得到第二个特征层的<code>cls_pred</code>的形状为[batch_size,19,19,6,21]。</p>
 <h2 id="五、loss的计算"><a href="#五、loss的计算" class="headerlink" title="五、loss的计算"></a>五、loss的计算</h2><p>&emsp;&emsp;SSD的loss是一个multitask的loss，包含分类损失和定位损失，公式如下所示</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/total_loss.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af679cd911.png" alt="total_loss.png"></p>
 <p>&emsp;&emsp;所有此处所有的loss值均是对一张图而言的，式子中的$N$代表所有default box中正样本（有对应GT box）的数量，$\alpha$用于调整分类损失和定位损失的比例，下面看一下二者的具体计算。</p>
 <p>&emsp;&emsp;首先看分类损失</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/conf_loss.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af679a4ee9.png" alt="conf_loss.png"></p>
 <p>&emsp;&emsp;式子中的$x_{ij}^p\in \{0,1\}$，类似于一个指示函数，当第i个default box与第j个GT box匹配并属于第p类时，$x_{ij}^p=1$，其他情况下$x_{ij}^p=0$。显然$c_i^p$就是之前得到的<code>logits</code>，所以整个式子其实就是一个交叉熵损失。</p>
 <p>​    接下来看一下定位损失。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/loc_loss.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a24d49.png" alt="loc_loss.png"></p>
 <p>&emsp;&emsp;定位损失中的$x_{ij}^p$与分类损失中的含义相同，$\hat g_j^m$根据下面的定义，含义是default box到其对应GT box的偏移，$l_i^m$则是预测的偏移，对二者的误差使用了smooth L1 loss。</p>
 <p>&emsp;&emsp;与之前的过程类似，可以在<code>train_ssd_network.py</code>中看到求loss的代码，如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ssd_net.losses(logits, localisations,</div><div class="line">               b_gclasses, b_glocalisations, b_gscores,</div><div class="line">               match_threshold=FLAGS.match_threshold,</div><div class="line">               negative_ratio=FLAGS.negative_ratio,</div><div class="line">               alpha=FLAGS.loss_alpha,</div><div class="line">               label_smoothing=FLAGS.label_smoothing)</div></pre></td></tr></table></figure>
@@ -710,7 +710,7 @@ w_k^a=s_k\sqrt{a_r}\ \ \ \ \ \ h_k^a=\displaystyle\frac{s_k}{\sqrt{a_r}}</script
       <section class="site-overview sidebar-panel">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg"
+               src="https://avatars2.githubusercontent.com/u/30823593?s=400&v=4"
                alt="ljm" />
           <p class="site-author-name" itemprop="name">ljm</p>
            
@@ -826,7 +826,7 @@ w_k^a=s_k\sqrt{a_r}\ \ \ \ \ \ h_k^a=\displaystyle\frac{s_k}{\sqrt{a_r}}</script
 <div class="copyright" >
   
   &copy; 
-  <span itemprop="copyrightYear">2018</span>
+  <span itemprop="copyrightYear">2019</span>
   <span class="with-love">
     <!--<i class="fa fa-heart"></i> -->
     <i class="fa fa-cog" aria-hidden="true"></i>

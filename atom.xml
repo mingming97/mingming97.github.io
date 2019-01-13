@@ -5,7 +5,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://mingming97.github.io/"/>
-  <updated>2018-10-28T06:58:07.967Z</updated>
+  <updated>2019-01-13T08:33:27.593Z</updated>
   <id>https://mingming97.github.io/</id>
   
   <author>
@@ -20,20 +20,20 @@
     <link href="https://mingming97.github.io/2018/10/21/SSD/"/>
     <id>https://mingming97.github.io/2018/10/21/SSD/</id>
     <published>2018-10-21T07:08:00.000Z</published>
-    <updated>2018-10-28T06:58:07.967Z</updated>
+    <updated>2019-01-13T08:33:27.593Z</updated>
     
     <content type="html"><![CDATA[<p>&emsp;&emsp;本文阅读的版本是tensorflow对SSD的实现，相对而言阅读难度要远低于caffe版本的实现，源代码可见<a href="https://github.com/balancap/SSD-Tensorflow/" target="_blank" rel="external">balancap/SSD-Tensorflow</a>。</p>
 <h2 id="一、思路"><a href="#一、思路" class="headerlink" title="一、思路"></a>一、思路</h2><p>&emsp;&emsp;SSD的网络结构在论文中清晰可见，如图所示。具体是使用了VGG的基础结构，保留了前五层，将fc6和fc7改为了带孔卷积层，而且去掉了池化层和dropout，在不增加参数的条件下指数级扩大了感受野，而且没有因为池化导致丢失太多的信息；后面再额外增加了3个卷积层和一个average pooling层，目的是使用不同层的feature map来检测不同尺度的物体。之后从前面的卷积层中提取了conv4_3，从后面新增的卷积层中提取了conv7，conv8_2，conv9_2，conv10_2，conv11_2来作为检测使用的特征图，在这些不同尺度特征图上提取不同数目的default boxes，对其进行分类和边框回归得到物体框和类别，最后进行nms来进行筛选。简而言之，SSD预测的目标就是以一张图中的所有提取出的anchor boxes为窗口，检测其中是否有物体，如果有，预测它的类别并对其位置进行精修，没有物体则将其分类为背景。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/structure.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a3a0cf.png" alt="structure.png"></p>
 <p>&emsp;&emsp;通俗一点的思路如下面的两个图所示，SSD所做的其实就是将feature map用额外的两个卷积层去卷积得到分类评分和边框回归的偏移，其中k表示从该层feature的每个anchor处提取的不同default boxes的个数，这些词具体是什么可以在后面的代码细节中看到。其他的一些细节，例如数据增广，mining hard examples等，也都在代码中有体现。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/ssdstruct.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a838a7.png" alt="ssdstruct.png"></p>
 <p>下面是提取结果的卷积层的放大图。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/extrafeature.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a2f47b.png" alt="extrafeature.png"></p>
 <p>&emsp;&emsp;每个feature map可以分两条路，分别得到分类结果和回归结果，再通过已有的ground truth box及其类别得到每个default box的分类和边框偏移，就可以计算loss，进行训练了。</p>
 <h2 id="二、default-boxes提取"><a href="#二、default-boxes提取" class="headerlink" title="二、default boxes提取"></a>二、default boxes提取</h2><p>&emsp;&emsp;default boxes的选取与faster rcnn中的anchor有一些类似，就是按照不同的scale和ratio生成k个boxes，看下面的图就能大概了解其思想</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes1.jpg" alt=""></p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes2.jpg" alt=""></p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes3.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a6a4ea.png" alt="defaultboxes1.png"></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a81572.png" alt="defaultboxes2.png"></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a7644c.png" alt="defaultboxes3.png"></p>
 <ul>
 <li><p>scale：scale指的是所检测的框的大小相对于原图的比例。比例低的可以框出图中的小物体，比例高的可以框出图中的大物体。深层次的feature map适合检测大物体，所以此处使用了一个线性关系来设置各个feature map所检测的scale。公式如下</p>
 <script type="math/tex; mode=display">
@@ -177,13 +177,13 @@ w_k^a=s_k\sqrt{a_r}\ \ \ \ \ \ h_k^a=\displaystyle\frac{s_k}{\sqrt{a_r}}</script
 <p>&emsp;&emsp;<code>ssd_multibox_layer</code>同样定义于<code>ssd_vgg_300.py</code>中，可以看到一开始对normalization值进行了判断，此处就是<code>SSDParams</code>中<code>normalizations</code>的作用，在SSD中由于第一个要提取特征层较浅，其norm较大，所以要对其进行沿channel方向的l2_normalize，而其他层无需进行此操作，代码中也仅是判断了<code>normalization</code>的值是否大于0，所以在<code>normalizations</code>中第一个值大于0，其他都小于0，20和-1无实际含义。</p>
 <p>&emsp;&emsp;下面则是对location的计算，首先使用了一个3*3卷积，通道数是每个中心default box的个数乘4，代表y，x，w，h四个偏移，从而得到了每个中心的边框偏移的结果，此处又进行了一个reshape操作，其中<code>tensor_shape</code>得到<code>loc_pred</code>的形状，再通过切片将最后一维去掉，再加上两维，分别是每个中心default box的个数，和4，这样就得到了[batch_size,size[0],size[1],num_anchors,4]的tensor。以第二个特征层为例，<code>loc_pred</code>的形状为[batch_size,19,19,6,4]，同理可以得到第二个特征层的<code>cls_pred</code>的形状为[batch_size,19,19,6,21]。</p>
 <h2 id="五、loss的计算"><a href="#五、loss的计算" class="headerlink" title="五、loss的计算"></a>五、loss的计算</h2><p>&emsp;&emsp;SSD的loss是一个multitask的loss，包含分类损失和定位损失，公式如下所示</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/total_loss.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af679cd911.png" alt="total_loss.png"></p>
 <p>&emsp;&emsp;所有此处所有的loss值均是对一张图而言的，式子中的$N$代表所有default box中正样本（有对应GT box）的数量，$\alpha$用于调整分类损失和定位损失的比例，下面看一下二者的具体计算。</p>
 <p>&emsp;&emsp;首先看分类损失</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/conf_loss.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af679a4ee9.png" alt="conf_loss.png"></p>
 <p>&emsp;&emsp;式子中的$x_{ij}^p\in \{0,1\}$，类似于一个指示函数，当第i个default box与第j个GT box匹配并属于第p类时，$x_{ij}^p=1$，其他情况下$x_{ij}^p=0$。显然$c_i^p$就是之前得到的<code>logits</code>，所以整个式子其实就是一个交叉熵损失。</p>
 <p>​    接下来看一下定位损失。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/loc_loss.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af67a24d49.png" alt="loc_loss.png"></p>
 <p>&emsp;&emsp;定位损失中的$x_{ij}^p$与分类损失中的含义相同，$\hat g_j^m$根据下面的定义，含义是default box到其对应GT box的偏移，$l_i^m$则是预测的偏移，对二者的误差使用了smooth L1 loss。</p>
 <p>&emsp;&emsp;与之前的过程类似，可以在<code>train_ssd_network.py</code>中看到求loss的代码，如下</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">ssd_net.losses(logits, localisations,</div><div class="line">               b_gclasses, b_glocalisations, b_gscores,</div><div class="line">               match_threshold=FLAGS.match_threshold,</div><div class="line">               negative_ratio=FLAGS.negative_ratio,</div><div class="line">               alpha=FLAGS.loss_alpha,</div><div class="line">               label_smoothing=FLAGS.label_smoothing)</div></pre></td></tr></table></figure>
@@ -214,7 +214,7 @@ w_k^a=s_k\sqrt{a_r}\ \ \ \ \ \ h_k^a=\displaystyle\frac{s_k}{\sqrt{a_r}}</script
     <link href="https://mingming97.github.io/2018/06/08/Word2Vec-basic/"/>
     <id>https://mingming97.github.io/2018/06/08/Word2Vec-basic/</id>
     <published>2018-06-08T02:14:01.000Z</published>
-    <updated>2018-06-12T11:41:07.971Z</updated>
+    <updated>2019-01-13T08:36:11.331Z</updated>
     
     <content type="html"><![CDATA[<p>&emsp;&emsp;本文需要对n-gram模型在评估语句上的应用有一定了解（n-gram还有一些其他应用，如模糊匹配、特征工程等），可以看作对<a href="https://blog.csdn.net/itplus/article/details/37969519" target="_blank" rel="external">word2vec 中的数学原理详解</a>这篇博文的一些思考。</p>
 <p>&emsp;&emsp;首先一定要建立起word2vec的基本认识，在NLP的一些任务中，我们需要将自然语言进行处理并发现其中的规律。但是机器没有办法直接理解自然语言，这就需要我们将其抽象化，换成一种机器能理解的表示方式。这就是word2vec的目的，将训练集中的词语表示成n维向量空间中的一个向量，而这个向量要对解决的问题有着尽可能好的特征表示。由此可以看出，word2vec与要解决的问题（也就是要训练的语言模型）是紧密相关的，所以一般情况下他们是一起进行训练的。例如keras中的Embedding层，官方解释是将字典下标转换为固定大小的向量。事实上这就是word2vec的一个过程，暂且不提keras是如何做的，要明确的一点是，Embedding层中的参数也是要随着训练的模型一起更新的，这有助于更好地理解之后的Skip-gram和CBOW模型。</p>
@@ -227,12 +227,12 @@ w_k^a=s_k\sqrt{a_r}\ \ \ \ \ \ h_k^a=\displaystyle\frac{s_k}{\sqrt{a_r}}</script
 <li><p>输出层（Outpu Layer）：输出层的结点数与词典的大小相同，代表下一个词是词典中某一个词的概率。按照图中所说就是$O = softmax(UZ + q)$。其中U为该层权重，q是bias，softmax是activation function。</p>
 </li>
 </ul>
-<p>  <img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/network.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82c18641.png" alt="network.png"></p>
 <p>  &emsp;&emsp;之后要介绍的网络都建立在这个三层模型的基础上，只是对一些流程做出了改动。</p>
 <h2 id="CBOW"><a href="#CBOW" class="headerlink" title="CBOW"></a>CBOW</h2><p>&emsp;&emsp;这个模型要解决的问题其实就是在知道当前词$w_t$的上下文$w_{t-2},w_{t-1},w_{t+1},w_{t+2}$的情况下，预测$w_t$。也就是要计算$P(w_t|context(w_t))$。大体如下图所示：</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOW-Architecture.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82bcf170.jpg" alt="CBOW-Architecture.jpg"></p>
 <p>&emsp;&emsp;对于其模型而言，去掉了之前的Hidden Layer，增加了一个Projection Layer，之前是将所有向量拼接，而现在是将所有向量求和，减少了参数数目，大体的模型如下。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOWmodel.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82be502d.png" alt="CBOWmodel.png"></p>
 <ul>
 <li><p>输入层：$Context(w)$中2c个词的词向量。</p>
 </li>
@@ -283,9 +283,9 @@ for \ j \leftarrow2\ to\ s_w\ do\\
 end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\
 \ \ \ \ \ \ for \ u \in Context(w) do\\
 \ \ \ \ \ \ v(u) \leftarrow v(u) + e</script><h2 id="Skip-gram"><a href="#Skip-gram" class="headerlink" title="Skip-gram"></a>Skip-gram</h2><p>&emsp;&emsp;与CBOW相反，这个模型要解决的问题是在已知词$w_t$的情况下，预测词$w_{t-2}, w_{t-1},w_{t+1},w_{t+2}$。也就是要计算$P(Context(w_t)|w_t)$，如下图所示：</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/Skip-Gram-Architecture-26.jpg" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82bd993d.jpg" alt="Skip-Gram-Architecture-26.jpg"></p>
 <p>&emsp;&emsp;对于其模型，与CBOW模型类似，为了与其对比，保留了projection layer，如下：</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/word2vec/SKIPGRAMmodel.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af82c03dcc.png" alt="SKIPGRAMmodel.png"></p>
 <ul>
 <li><p>输入层：词向量$v(w)$</p>
 </li>
@@ -352,11 +352,11 @@ end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\</scrip
     <link href="https://mingming97.github.io/2018/05/17/chinese-split-word/"/>
     <id>https://mingming97.github.io/2018/05/17/chinese-split-word/</id>
     <published>2018-05-17T09:40:01.000Z</published>
-    <updated>2018-05-18T09:51:04.149Z</updated>
+    <updated>2019-01-13T08:37:19.853Z</updated>
     
     <content type="html"><![CDATA[<h2 id="基本思路"><a href="#基本思路" class="headerlink" title="基本思路"></a>基本思路</h2><p>&emsp;&emsp;中文分词其实有很多种思路，大多都是建立在HMM模型的基础上。先简要介绍一下HMM模型，HMM模型中有三个要素：A是状态转移概率分布矩阵，简单说就是在任一时刻从一个隐含状态到另一个隐含状态的转移概率构成的矩阵；B是观测概率分布矩阵，其实就是在任一时刻给定隐含状态s生成观测状态o的条件概率$P(o|s)$构成的矩阵；$\pi$是初始概率矩阵，也就是在初始状态下各隐含状态的概率。而一般的HMM模型有三个基本问题：1. 给定模型$\lambda = (A, B, \pi)$和观测序列$O = \{o_1, o_2, \dots, o_t\}$，计算$P(O|\lambda)$，这是评估问题。2. 给定观测序列$O = \{o_1, o_2, \dots, o_t\}$，求解模型$\lambda = (A, B, \pi$，使得$P(O|\lambda)$尽可能大，这是学习问题，若给定隐含状态序列S可以考虑用maximum likelihood来解决，若隐含状态序列则可以用Baum-Welch算法解决，不过这并不是本文重点。3. 给定 给定模型$\lambda = (A, B, \pi)$和观测序列$O = \{o_1, o_2, \dots, o_t\}$，求使得$P(S|O)$最大的隐含状态序列$S = \{s_1, s_2, \dots, s_t\}$，这被称为解码问题或预测问题。对于分词这个任务来说，主要涉及到的是第三个问题。<br>&emsp;&emsp;jieba分词的源码就提供了解决这个问题的一个很好的范例。将隐含状态集合定义为$\{S, B, M, E\}$，S的含义是单字，B的含义是词头，M的含义是词中，E的含义是词尾。在 <code>jieba/finaseg/prob_start.py</code>中定义了初始概率$\pi$，在 <code>jieba/finaseg/prob_trans.py</code>中定义了状态转移概率$A$，在<code>jieba/finaseg/prob_emit.py</code>中定义了状态观测概率分布$B$，在用基于统计的方法获得以上这些之后就用Viterbi算法求一条使得$P(S|O)$最大的路径就好。（关于Viterbi算法还是在另篇文章中再说。）<br>&emsp;&emsp;考虑一下，此时如果我们不知道B，该如何定义要求解的函数。可以试着模仿Viterbi的想法，用$\delta_i(s)$表示到第i个字时状态为s时的最优值，则$\delta_{i+1}(s’) = max\{\delta_i(s)a_{ss’}P(s|i),  s\in\{S, B, M, E\}\}$，其中$a_{ss’}$是转移概率，$P(s|i)$表示第i个字状态是s的概率（这样定义是有着一定数学原理的，具体推导也借鉴了Viterbi算法原本的定义，核心思想是极大似然）。转移概率可通过统计的方法得到，那么$P(s|i)$呢？影响到这个概率的因素很多，不妨将这个问题转化为一个seq2seq的问题，输入一个序列，输出各个位置的4-tag标注。中文中通过前后文语境都能作为序列标注的依据，从而考虑使用Bi-directional的LSTM来进行这个任务。只要将输出接一层softmax就可以将结果当作概率使用。</p>
 <h2 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h2><p>&emsp;&emsp;有一个经典的亚研院的语料库就是4-tag标注的，大概长这个样子。</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/chinesesplitwords/msrtrain.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af89cb9124.png" alt="msrtrain.png"></p>
 <p>&emsp;&emsp;首先要明确我们训练数据的lstm的输入，应该是batch_size * sentence_len的一个tensor。以标点符号为分隔，汉语中单句话一般没有太长，所以此处统一每个句向量的长度为32。获得句向量的方式很简单，将文章中所有出现的字做成一个字典，将每个字用其在字典中对应的下位置表示，不足的长度用0补齐，就得到了句向量的表示。而对于tag，则可以使用one-hot的编码，注意要为补足句向量的0留一个编码位置，所以一共有5类tag。因此一句话中tag为s的字将被编码为[1, 0, 0, 0, 0]，tag为b的将被编码为[0, 1, 0, 0, 0]，以此类推。<br>&emsp;&emsp;明确了以上过程，就可以开始细节上的处理。注意到每行前面有很多“/s，”/s，‘/s，’/s一类的东西，我们的数据是不需要这类东西的，可以用正则处理掉。处理掉之后单看每行，可以方便的使用python的re.findall提取出来一个字和标签的元组组成的列表。再将二者分别处理，分别得到句子和标签。<br>&emsp;&emsp;通过标签得到独热编码的过程值得记录一下。面对的问题就是给出了一个类别的列表，如何得到独热编码。可以利用numpy的花式索引方便进行。代码如下：（虽然花式索引返回的是数据的拷贝，但是使用花式索引进行赋值却是在原数组上进行操作的）<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">data = np.array(data)	<span class="comment"># 获得numpy的数组</span></div><div class="line">one_hot = np.zeros((len(data), <span class="number">5</span>), dtype=np.float64)	<span class="comment"># 获得len(data)个长度为5的0向量</span></div><div class="line">one_hot[range(len(data)), data] = <span class="number">1</span>		<span class="comment"># 二维花式索引 可以实现任意位置的操作</span></div><div class="line">default = np.array([<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">1</span>], dtype=np.float64)	<span class="comment"># 定义默认向量</span></div><div class="line">default = np.tile(default, (<span class="number">32</span> - len(one_hot), <span class="number">1</span>))	<span class="comment"># 将默认向量在列方向上重复32-len(one_hot)次</span></div><div class="line">one_hot = np.concatenate((one_hot, default), axis = <span class="number">0</span>)	<span class="comment"># 将默认部分与有效部分拼接保证长度与句向量相同</span></div></pre></td></tr></table></figure></p>
 <h2 id="模型定义及训练"><a href="#模型定义及训练" class="headerlink" title="模型定义及训练"></a>模型定义及训练</h2><p>&emsp;&emsp;接下类就是定义一个双向LSTM的过程，为了简单起见，使用了keras进行，keras中还有embedding层，正好适用于我们生成的句向量。keras封装度比较高，所以代码较短，如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">inputs = Input(shape=(sent_len,), dtype=<span class="string">'int32'</span>)</div><div class="line">embedding = Embedding(len(charsets) + <span class="number">1</span>, word_size, input_length=sent_len, mask_zero=<span class="keyword">True</span>)(inputs)</div><div class="line">bilstm_layer = Bidirectional(LSTM(<span class="number">64</span>, return_sequences=<span class="keyword">True</span>), merge_mode=<span class="string">'sum'</span>)(embedding)</div><div class="line">output = TimeDistributed(Dense(<span class="number">5</span>, activation=<span class="string">'softmax'</span>))(bilstm_layer)</div><div class="line">model = Model(input=inputs, output=output) model.compile(loss=<span class="string">'categorical_crossentropy'</span>, optimizer=<span class="string">'adam'</span>, metrics=[<span class="string">'accuracy'</span>])</div><div class="line">json.dump(model.to_json(), open(os.path.join(filedir, model_name), <span class="string">"w"</span>))</div><div class="line">model.fit(x, y, batch_size=batch_size, epochs=epochs)</div><div class="line">model.save_weights(os.path.join(filedir, model_weights_name))</div></pre></td></tr></table></figure>
@@ -364,8 +364,8 @@ end\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \\</scrip
 <h2 id="计算概率最大路径"><a href="#计算概率最大路径" class="headerlink" title="计算概率最大路径"></a>计算概率最大路径</h2><p>&emsp;&emsp;根据之前对$\delta_i(s)$的定义，使用dp就可以计算概率最大的路径了。此处转移概率用的是相等概率，dp算法的具体实现上利用了python字典的性质，代码如下：</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">viterbi</span><span class="params">(nodes)</span>:</span></div><div class="line">    path = &#123;<span class="string">'b'</span>: nodes[<span class="number">0</span>][<span class="string">'b'</span>], <span class="string">'s'</span>: nodes[<span class="number">0</span>][<span class="string">'s'</span>]&#125;</div><div class="line">    <span class="keyword">for</span> layer_num <span class="keyword">in</span> range(<span class="number">1</span>, len(nodes)):</div><div class="line">        old_path = path.copy()</div><div class="line">        path = &#123;&#125;</div><div class="line">        <span class="keyword">for</span> new_tag <span class="keyword">in</span> nodes[layer_num].keys():</div><div class="line">            tmp = &#123;&#125;</div><div class="line">            <span class="keyword">if</span> layer_num == len(nodes) - <span class="number">1</span>:</div><div class="line">                <span class="keyword">if</span> new_tag <span class="keyword">in</span> [<span class="string">"m"</span>, <span class="string">"b"</span>]:</div><div class="line">                    <span class="keyword">continue</span></div><div class="line">            <span class="keyword">for</span> old_path_tag <span class="keyword">in</span> old_path.keys():</div><div class="line">                <span class="keyword">if</span> old_path_tag[<span class="number">-1</span>]+new_tag <span class="keyword">in</span> transpose_matrix.keys():</div><div class="line">                    tmp[old_path_tag+new_tag] = old_path[old_path_tag] + \</div><div class="line">                                                nodes[layer_num][new_tag] + \</div><div class="line">                                                transpose_matrix[old_path_tag[<span class="number">-1</span>]+new_tag]</div><div class="line">            k = np.argmax(list(tmp.values()))</div><div class="line">            path[list(tmp.keys())[k]] = list(tmp.values())[k]</div><div class="line">    <span class="keyword">return</span> list(path.keys())[np.argmax(list(path.values()))]</div></pre></td></tr></table></figure>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>通过以上几个步骤，就完成了对一句话4-tag的标注。自己试了几句话，效果还不错，见图：</p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/chinesesplitwords/result1.png" alt=""></p>
-<p><img src="http://ov718qcsg.bkt.clouddn.com/blog/chinesesplitwords/result2.png" alt=""></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af89cb53f3.png" alt="result1.png"></p>
+<p><img src="https://i.loli.net/2019/01/13/5c3af89cb71fb.png" alt="result2.png"></p>
 <p>完整代码可以参照我的<a href="https://github.com/mingming97/Chinese-Word-Split" target="_blank" rel="external">Github</a>。</p>
 ]]></content>
     
