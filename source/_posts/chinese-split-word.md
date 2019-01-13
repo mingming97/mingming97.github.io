@@ -17,7 +17,7 @@ categories: NLP
 
 &emsp;&emsp;有一个经典的亚研院的语料库就是4-tag标注的，大概长这个样子。
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/chinesesplitwords/msrtrain.png)
+![msrtrain.png](https://i.loli.net/2019/01/13/5c3af89cb9124.png)
 
 &emsp;&emsp;首先要明确我们训练数据的lstm的输入，应该是batch_size * sentence_len的一个tensor。以标点符号为分隔，汉语中单句话一般没有太长，所以此处统一每个句向量的长度为32。获得句向量的方式很简单，将文章中所有出现的字做成一个字典，将每个字用其在字典中对应的下位置表示，不足的长度用0补齐，就得到了句向量的表示。而对于tag，则可以使用one-hot的编码，注意要为补足句向量的0留一个编码位置，所以一共有5类tag。因此一句话中tag为s的字将被编码为[1, 0, 0, 0, 0]，tag为b的将被编码为[0, 1, 0, 0, 0]，以此类推。
 &emsp;&emsp;明确了以上过程，就可以开始细节上的处理。注意到每行前面有很多“/s，”/s，‘/s，’/s一类的东西，我们的数据是不需要这类东西的，可以用正则处理掉。处理掉之后单看每行，可以方便的使用python的re.findall提取出来一个字和标签的元组组成的列表。再将二者分别处理，分别得到句子和标签。
@@ -86,9 +86,9 @@ def viterbi(nodes):
 
 通过以上几个步骤，就完成了对一句话4-tag的标注。自己试了几句话，效果还不错，见图：
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/chinesesplitwords/result1.png)
+![result1.png](https://i.loli.net/2019/01/13/5c3af89cb53f3.png)
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/chinesesplitwords/result2.png)
+![result2.png](https://i.loli.net/2019/01/13/5c3af89cb71fb.png)
 
 完整代码可以参照我的[Github](https://github.com/mingming97/Chinese-Word-Split)。
 

@@ -11,15 +11,17 @@ categories: CV
 
 &emsp;&emsp;SSD的网络结构在论文中清晰可见，如图所示。具体是使用了VGG的基础结构，保留了前五层，将fc6和fc7改为了带孔卷积层，而且去掉了池化层和dropout，在不增加参数的条件下指数级扩大了感受野，而且没有因为池化导致丢失太多的信息；后面再额外增加了3个卷积层和一个average pooling层，目的是使用不同层的feature map来检测不同尺度的物体。之后从前面的卷积层中提取了conv4_3，从后面新增的卷积层中提取了conv7，conv8_2，conv9_2，conv10_2，conv11_2来作为检测使用的特征图，在这些不同尺度特征图上提取不同数目的default boxes，对其进行分类和边框回归得到物体框和类别，最后进行nms来进行筛选。简而言之，SSD预测的目标就是以一张图中的所有提取出的anchor boxes为窗口，检测其中是否有物体，如果有，预测它的类别并对其位置进行精修，没有物体则将其分类为背景。
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/structure.png)
+
+![structure.png](https://i.loli.net/2019/01/13/5c3af67a3a0cf.png)
+
 
 &emsp;&emsp;通俗一点的思路如下面的两个图所示，SSD所做的其实就是将feature map用额外的两个卷积层去卷积得到分类评分和边框回归的偏移，其中k表示从该层feature的每个anchor处提取的不同default boxes的个数，这些词具体是什么可以在后面的代码细节中看到。其他的一些细节，例如数据增广，mining hard examples等，也都在代码中有体现。
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/ssdstruct.jpg)
+![ssdstruct.png](https://i.loli.net/2019/01/13/5c3af67a838a7.png)
 
 下面是提取结果的卷积层的放大图。
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/extrafeature.jpg)
+![extrafeature.png](https://i.loli.net/2019/01/13/5c3af67a2f47b.png)
 
 &emsp;&emsp;每个feature map可以分两条路，分别得到分类结果和回归结果，再通过已有的ground truth box及其类别得到每个default box的分类和边框偏移，就可以计算loss，进行训练了。
 
@@ -29,11 +31,11 @@ categories: CV
 
 &emsp;&emsp;default boxes的选取与faster rcnn中的anchor有一些类似，就是按照不同的scale和ratio生成k个boxes，看下面的图就能大概了解其思想
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes1.jpg)
+![defaultboxes1.png](https://i.loli.net/2019/01/13/5c3af67a6a4ea.png)
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes2.jpg)
+![defaultboxes2.png](https://i.loli.net/2019/01/13/5c3af67a81572.png)
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/defaultboxes3.jpg)
+![defaultboxes3.png](https://i.loli.net/2019/01/13/5c3af67a7644c.png)
 
 - scale：scale指的是所检测的框的大小相对于原图的比例。比例低的可以框出图中的小物体，比例高的可以框出图中的大物体。深层次的feature map适合检测大物体，所以此处使用了一个线性关系来设置各个feature map所检测的scale。公式如下
   $$
@@ -628,19 +630,19 @@ def ssd_multibox_layer(inputs,
 
 &emsp;&emsp;SSD的loss是一个multitask的loss，包含分类损失和定位损失，公式如下所示
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/total_loss.png)
+![total_loss.png](https://i.loli.net/2019/01/13/5c3af679cd911.png)
 
 &emsp;&emsp;所有此处所有的loss值均是对一张图而言的，式子中的$N$代表所有default box中正样本（有对应GT box）的数量，$\alpha$用于调整分类损失和定位损失的比例，下面看一下二者的具体计算。
 
 &emsp;&emsp;首先看分类损失
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/conf_loss.png)
+![conf_loss.png](https://i.loli.net/2019/01/13/5c3af679a4ee9.png)
 
 &emsp;&emsp;式子中的$x_{ij}^p\in \{0,1\}$，类似于一个指示函数，当第i个default box与第j个GT box匹配并属于第p类时，$x_{ij}^p=1$，其他情况下$x_{ij}^p=0$。显然$c_i^p$就是之前得到的`logits`，所以整个式子其实就是一个交叉熵损失。
 
 ​	接下来看一下定位损失。
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/ssdtensorflow/loc_loss.png)
+![loc_loss.png](https://i.loli.net/2019/01/13/5c3af67a24d49.png)
 
 &emsp;&emsp;定位损失中的$x_{ij}^p$与分类损失中的含义相同，$\hat g_j^m$根据下面的定义，含义是default box到其对应GT box的偏移，$l_i^m$则是预测的偏移，对二者的误差使用了smooth L1 loss。
 

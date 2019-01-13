@@ -22,7 +22,7 @@ categories: NLP
 
   
 
-  ![](http://ov718qcsg.bkt.clouddn.com/blog/word2vec/network.png)
+![network.png](https://i.loli.net/2019/01/13/5c3af82c18641.png)
 
   &emsp;&emsp;之后要介绍的网络都建立在这个三层模型的基础上，只是对一些流程做出了改动。
 
@@ -30,11 +30,11 @@ categories: NLP
 
 &emsp;&emsp;这个模型要解决的问题其实就是在知道当前词$w_t$的上下文$w_{t-2},w_{t-1},w_{t+1},w_{t+2}$的情况下，预测$w_t$。也就是要计算$P(w_t|context(w_t))$。大体如下图所示：
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOW-Architecture.jpg)
+![CBOW-Architecture.jpg](https://i.loli.net/2019/01/13/5c3af82bcf170.jpg)
 
 &emsp;&emsp;对于其模型而言，去掉了之前的Hidden Layer，增加了一个Projection Layer，之前是将所有向量拼接，而现在是将所有向量求和，减少了参数数目，大体的模型如下。
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/word2vec/CBOWmodel.png)
+![CBOWmodel.png](https://i.loli.net/2019/01/13/5c3af82be502d.png)
 
 - 输入层：$Context(w)$中2c个词的词向量。
 
@@ -114,11 +114,11 @@ $$
 
 &emsp;&emsp;与CBOW相反，这个模型要解决的问题是在已知词$w_t$的情况下，预测词$w_{t-2}, w_{t-1},w_{t+1},w_{t+2}$。也就是要计算$P(Context(w_t)|w_t)$，如下图所示：
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/word2vec/Skip-Gram-Architecture-26.jpg)
+![Skip-Gram-Architecture-26.jpg](https://i.loli.net/2019/01/13/5c3af82bd993d.jpg)
 
 &emsp;&emsp;对于其模型，与CBOW模型类似，为了与其对比，保留了projection layer，如下：
 
-![](http://ov718qcsg.bkt.clouddn.com/blog/word2vec/SKIPGRAMmodel.png)
+![SKIPGRAMmodel.png](https://i.loli.net/2019/01/13/5c3af82c03dcc.png)
 
 - 输入层：词向量$v(w)$
 

@@ -127,7 +127,7 @@ social_icons:
 # Sidebar Avatar
 # in theme directory(source/images): /images/avatar.jpg
 # in site  directory(source/uploads): /uploads/avatar.jpg
-avatar: http://ov718qcsg.bkt.clouddn.com/blog/timg.jpg
+avatar: https://avatars2.githubusercontent.com/u/30823593?s=400&v=4
 
 # Table Of Contents in the Sidebar
 toc:
