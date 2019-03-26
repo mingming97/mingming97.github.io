@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head>
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2" rel="stylesheet">
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.lug.ustc.edu.cn/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="object detection," />
+
+
+
+
+
+  <link rel="alternate" href="/atom.xml" title="ljm's blog" type="application/atom+xml" />
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="http://ov718qcsg.bkt.clouddn.com/blog/icon/dove_128px_1154091_easyicon.net.ico?v=5.1.2" />
+
+
+
+
+
+
+<meta name="description" content="anchor自从在faster rcnn中提出后，被广泛应用于物体检测中，流程可概括如下（one stage）  通过backbone和neck（fpn等）网络得到feature map并根据feature map用head网络生成各个尺度的cls score和reg score 生成anchor 将anchor assign给对应的gt box 根据assign result按一定策略sampl">
+<meta name="keywords" content="object detection">
+<meta property="og:type" content="article">
+<meta property="og:title" content="物体检测中的anchor">
+<meta property="og:url" content="https://mingming97.github.io/2019/03/26/anchor in object detection/index.html">
+<meta property="og:site_name" content="ljm&#39;s blog">
+<meta property="og:description" content="anchor自从在faster rcnn中提出后，被广泛应用于物体检测中，流程可概括如下（one stage）  通过backbone和neck（fpn等）网络得到feature map并根据feature map用head网络生成各个尺度的cls score和reg score 生成anchor 将anchor assign给对应的gt box 根据assign result按一定策略sampl">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-26T11:48:27.147Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="物体检测中的anchor">
+<meta name="twitter:description" content="anchor自从在faster rcnn中提出后，被广泛应用于物体检测中，流程可概括如下（one stage）  通过backbone和neck（fpn等）网络得到feature map并根据feature map用head网络生成各个尺度的cls score和reg score 生成anchor 将anchor assign给对应的gt box 根据assign result按一定策略sampl">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://mingming97.github.io/2019/03/26/anchor in object detection/"/>
+
+
+
+
+
+  <title>物体检测中的anchor | ljm's blog</title><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  
+  <!-- hexo-inject:begin --><!-- hexo-inject:end --><script type="text/javascript"
+  color="0,0,255" opacity="0.3" zIndex="-1" count="30" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js"></script>
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <a href="https://github.com/mingming97"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/a6677b08c955af8400f44c6298f40e7d19cc5b2d/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png"></a> 
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">ljm's blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-sitemap">
+          <a href="/sitemap.xml" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-sitemap"></i> <br />
+            
+            站点地图
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br />
+            
+            关于
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://mingming97.github.io/2019/03/26/anchor in object detection/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="ljm">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="https://avatars2.githubusercontent.com/u/30823593?s=400&v=4">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ljm's blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">物体检测中的anchor</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-26T17:55:00+08:00">
+                2019-03-26
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/CV/" itemprop="url" rel="index">
+                    <span itemprop="name">CV</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1,039
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  5
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>anchor自从在faster rcnn中提出后，被广泛应用于物体检测中，流程可概括如下（one stage）</p>
+<ol>
+<li>通过backbone和neck（fpn等）网络得到feature map并根据feature map用head网络生成各个尺度的cls score和reg score</li>
+<li>生成anchor</li>
+<li>将anchor assign给对应的gt box</li>
+<li>根据assign result按一定策略sample出正负样本</li>
+<li>计算loss</li>
+</ol>
+<p>（以上英文单词均遵循mmdetection的命名）</p>
+<p>&emsp;&emsp;而anchor生成在一般的实现中都会使用到三个参数，anchor ratios，anchor strides，scales，其中anchor ratios很好解释，指的就是宽高比（h:s）；而anchor strides则有一点绕，我的理解是它指的是感受野的大小，也就是对应feature map对应到原图多少个像素，所以它的值等于原图中anchor的基础大小，这在代码中一般写作base_size，有了base_size，就可以得到一个基础框，此时一般使用((0, 0), (anchor_stride-1, anchor_stride-1))这个框，也就是图中最左上的一个框。。通过这个坐标，可以很轻松的计算出中心(x_ctr, y_ctr)，宽和高就是base_size；scales也很简单，就是放缩的尺度，要将宽和高按照各个scale的值放大。</p>
+<p>&emsp;&emsp;例如：当anchor stride = 4，anchor_ratios = [0.5, 1.0, 2.0]，scales = [4, 8, 16]时，首先可以得到一个((0,0),(3,3))的基础框，宽高都为4，将这个4$\times$4的区域按照anchor_ratios进行变换，保证面积不变，宽高比符合要求，可以做如下转换</p>
+<script type="math/tex; mode=display">
+\begin{align}
+& hs=h*\sqrt{ratio} \\
+& ws = \displaystyle\frac{w}{\sqrt{ratio}}
+\end{align}</script><p>也可以按如下方式转换</p>
+<script type="math/tex; mode=display">
+\begin{align}
+& hs = \sqrt{wh\cdot ratio} \\
+& ws = \displaystyle\frac{\sqrt{wh}}{\sqrt{ratio}}
+\end{align}</script><p>&emsp;&emsp;无论用哪种方式都能保证面积不变，而宽高比符合anchor_ratios。将转换后的hs和ws乘上对应的scales，就能得到放缩后的anchor，有三种ratio，三种scale，一共可以得到9个anchor，再根据中心坐标，算出每个anchor的((xmin, ymin),(xmax, ymax))。</p>
+<p>&emsp;&emsp;得到左上角的所有anchor坐标之后，只需要对他们进行坐标的平移，就能得到整张图片上所有的anchor的坐标，有平移就会涉及到x和y方向的stride，一般将stride设为与anchor_stride相等，也可以根据情况自己设置。</p>
+<p>&emsp;&emsp;mmdetection中AnchorGenerator类实现的就是这一过程，除此之外，如果坐标在图外显然是invalid的，mmdetection中还对feat_map上有效的anchor进行了计算，该类中仅仅处理了右侧和下侧的边界问题，而对于上侧和左侧的边界，也就是0一侧的判断是在<code>anchor_target.py</code>中的<code>anchor_inside_flags</code>函数中处理的，该函数中同样考虑了右侧和下侧的边界，得到的是所有合法anchor。</p>
+<p>以下是AnchorGenerator的代码，结合上面的说明理解起来并不困难</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">AnchorGenerator</span><span class="params">(object)</span>:</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, base_size, scales, ratios, scale_major=True, ctr=None)</span>:</span></div><div class="line">        self.base_size = base_size</div><div class="line">        self.scales = torch.Tensor(scales)</div><div class="line">        self.ratios = torch.Tensor(ratios)</div><div class="line">        self.scale_major = scale_major</div><div class="line">        self.ctr = ctr</div><div class="line">        self.base_anchors = self.gen_base_anchors()</div><div class="line"></div><div class="line"><span class="meta">    @property</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">num_base_anchors</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self.base_anchors.size(<span class="number">0</span>)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">gen_base_anchors</span><span class="params">(self)</span>:</span></div><div class="line">        w = self.base_size</div><div class="line">        h = self.base_size</div><div class="line">        <span class="keyword">if</span> self.ctr <span class="keyword">is</span> <span class="keyword">None</span>:</div><div class="line">            x_ctr = <span class="number">0.5</span> * (w - <span class="number">1</span>)</div><div class="line">            y_ctr = <span class="number">0.5</span> * (h - <span class="number">1</span>)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            x_ctr, y_ctr = self.ctr</div><div class="line"></div><div class="line">        h_ratios = torch.sqrt(self.ratios)</div><div class="line">        w_ratios = <span class="number">1</span> / h_ratios</div><div class="line">        <span class="keyword">if</span> self.scale_major:</div><div class="line">            ws = (w * w_ratios[:, <span class="keyword">None</span>] * self.scales[<span class="keyword">None</span>, :]).view(<span class="number">-1</span>)</div><div class="line">            hs = (h * h_ratios[:, <span class="keyword">None</span>] * self.scales[<span class="keyword">None</span>, :]).view(<span class="number">-1</span>)</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            ws = (w * self.scales[:, <span class="keyword">None</span>] * w_ratios[<span class="keyword">None</span>, :]).view(<span class="number">-1</span>)</div><div class="line">            hs = (h * self.scales[:, <span class="keyword">None</span>] * h_ratios[<span class="keyword">None</span>, :]).view(<span class="number">-1</span>)</div><div class="line"></div><div class="line">        base_anchors = torch.stack(</div><div class="line">            [</div><div class="line">                x_ctr - <span class="number">0.5</span> * (ws - <span class="number">1</span>), y_ctr - <span class="number">0.5</span> * (hs - <span class="number">1</span>),</div><div class="line">                x_ctr + <span class="number">0.5</span> * (ws - <span class="number">1</span>), y_ctr + <span class="number">0.5</span> * (hs - <span class="number">1</span>)</div><div class="line">            ],</div><div class="line">            dim=<span class="number">-1</span>).round()</div><div class="line"></div><div class="line">        <span class="keyword">return</span> base_anchors</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">_meshgrid</span><span class="params">(self, x, y, row_major=True)</span>:</span></div><div class="line">        xx = x.repeat(len(y))</div><div class="line">        yy = y.view(<span class="number">-1</span>, <span class="number">1</span>).repeat(<span class="number">1</span>, len(x)).view(<span class="number">-1</span>)</div><div class="line">        <span class="keyword">if</span> row_major:</div><div class="line">            <span class="keyword">return</span> xx, yy</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="keyword">return</span> yy, xx</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">grid_anchors</span><span class="params">(self, featmap_size, stride=<span class="number">16</span>, device=<span class="string">'cuda'</span>)</span>:</span></div><div class="line">        base_anchors = self.base_anchors.to(device)</div><div class="line"></div><div class="line">        feat_h, feat_w = featmap_size</div><div class="line">        shift_x = torch.arange(<span class="number">0</span>, feat_w, device=device) * stride</div><div class="line">        shift_y = torch.arange(<span class="number">0</span>, feat_h, device=device) * stride</div><div class="line">        shift_xx, shift_yy = self._meshgrid(shift_x, shift_y)</div><div class="line">        shifts = torch.stack([shift_xx, shift_yy, shift_xx, shift_yy], dim=<span class="number">-1</span>)</div><div class="line">        shifts = shifts.type_as(base_anchors)</div><div class="line">        <span class="comment"># first feat_w elements correspond to the first row of shifts</span></div><div class="line">        <span class="comment"># add A anchors (1, A, 4) to K shifts (K, 1, 4) to get</span></div><div class="line">        <span class="comment"># shifted anchors (K, A, 4), reshape to (K*A, 4)</span></div><div class="line"></div><div class="line">        all_anchors = base_anchors[<span class="keyword">None</span>, :, :] + shifts[:, <span class="keyword">None</span>, :]</div><div class="line">        all_anchors = all_anchors.view(<span class="number">-1</span>, <span class="number">4</span>)</div><div class="line">        <span class="comment"># first A rows correspond to A anchors of (0, 0) in feature map,</span></div><div class="line">        <span class="comment"># then (0, 1), (0, 2), ...</span></div><div class="line">        <span class="keyword">return</span> all_anchors</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">valid_flags</span><span class="params">(self, featmap_size, valid_size, device=<span class="string">'cuda'</span>)</span>:</span></div><div class="line">        feat_h, feat_w = featmap_size</div><div class="line">        valid_h, valid_w = valid_size</div><div class="line">        <span class="keyword">assert</span> valid_h &lt;= feat_h <span class="keyword">and</span> valid_w &lt;= feat_w</div><div class="line">        valid_x = torch.zeros(feat_w, dtype=torch.uint8, device=device)</div><div class="line">        valid_y = torch.zeros(feat_h, dtype=torch.uint8, device=device)</div><div class="line">        valid_x[:valid_w] = <span class="number">1</span></div><div class="line">        valid_y[:valid_h] = <span class="number">1</span></div><div class="line">        valid_xx, valid_yy = self._meshgrid(valid_x, valid_y)</div><div class="line">        valid = valid_xx &amp; valid_yy</div><div class="line">        valid = valid[:, <span class="keyword">None</span>].expand(</div><div class="line">            valid.size(<span class="number">0</span>), self.num_base_anchors).contiguous().view(<span class="number">-1</span>)</div><div class="line">        <span class="keyword">return</span> valid</div></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/object-detection/" rel="tag"><i class="fa fa-tag"></i> object detection</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/21/SSD/" rel="next" title="SSD源码阅读及原理详解">
+                <i class="fa fa-chevron-left"></i> SSD源码阅读及原理详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <section class="site-overview sidebar-panel sidebar-panel-active">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="https://avatars2.githubusercontent.com/u/30823593?s=400&v=4"
+               alt="ljm" />
+          <p class="site-author-name" itemprop="name">ljm</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives">
+            
+                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-categories">
+              <a href="/categories/index.html">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              <a href="/tags/index.html">
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+          <div class="feed-link motion-element">
+            <a href="/atom.xml" rel="alternate">
+              <i class="fa fa-rss"></i>
+              RSS
+            </a>
+          </div>
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/mingming97" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                    
+                      GitHub
+                    
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+<div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <!--<i class="fa fa-heart"></i> -->
+    <i class="fa fa-cog" aria-hidden="true"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">ljm</span>
+
+  
+</div>
+
+
+  
+  <div class="powered-by">
+  <i class="fa fa-user-md"></i><span id="busuanzi_container_site_pv">
+    访客数:<span id="busuanzi_value_site_pv">
+  </div>
+
+<!--
+  <span class="post-meta-divider">|</span>
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+-->
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+  
+  <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+        }
+      });
+    </script>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Queue(function() {
+        var all = MathJax.Hub.getAllJax(), i;
+        for (i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+        }
+      });
+    </script>
+    <script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.7.1/latest.js?config=TeX-AMS-MML_HTMLorMML"></script><!-- hexo-inject:begin --><!-- hexo-inject:end -->
+  
+
+
+  
+
+  
+
+</body>
+</html>
