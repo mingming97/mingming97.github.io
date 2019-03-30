@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://mingming97.github.io/2019/03/29/mmdetection%20retinanet/</loc>
+    
+    <lastmod>2019-03-30T12:05:29.056Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://mingming97.github.io/2019/03/26/anchor%20in%20object%20detection/</loc>
     
     <lastmod>2019-03-26T11:48:27.147Z</lastmod>
